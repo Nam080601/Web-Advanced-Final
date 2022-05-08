@@ -81,10 +81,6 @@ router.get('/reset', (req, res, next) => {
   res.redirect('/');
 });
 
-router.get("/a", (req, res) => {
-  res.render('home', {title: 'ahihi'});
-});
-
 router.post("/", (req, res) => {
 
 });
