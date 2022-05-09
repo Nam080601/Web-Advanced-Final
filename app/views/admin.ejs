@@ -23,6 +23,7 @@
             <th>Họ tên</th>
             <th>CMND</th>
             <th>Ngày tạo</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -32,6 +33,14 @@
 			  <td><%= user.name %></td>
 			  <td><%= user.cmnd %></td>
 			  <td><%= user.createdAt %></td>
+			  <td>
+          <button 
+            class="btn btn-primary" 
+            data-bs-toggle="modal" 
+            data-bs-target="#detail" 
+            data-bs-whatever=<%= user._id %>
+          >Chi tiết</button>
+        </td>
 			</tr>
 		  <% } %>
 		</tbody>
@@ -45,6 +54,7 @@
             <th>Họ tên</th>
             <th>CMND</th>
             <th>Ngày tạo</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -53,18 +63,42 @@
             <td>Phạm Duy Khánh</td>
             <td>2412315264</td>
             <td>20/04/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
           <tr>
             <td>duytran</td>
             <td>Trần Thanh Duy</td>
             <td>2411629563</td>
             <td>18/03/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
           <tr>
             <td>linhnguyen24</td>
             <td>Nguyễn Ngọc Linh</td>
             <td>2412319574</td>
             <td>29/01/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -77,6 +111,7 @@
             <th>Họ tên</th>
             <th>CMND</th>
             <th>Ngày tạo</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -85,18 +120,42 @@
             <td>Phạm Duy Khánh</td>
             <td>2412315264</td>
             <td>20/04/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
           <tr>
             <td>duytran</td>
             <td>Trần Thanh Duy</td>
             <td>2411629563</td>
             <td>18/03/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
           <tr>
             <td>linhnguyen24</td>
             <td>Nguyễn Ngọc Linh</td>
             <td>2412319574</td>
             <td>29/01/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
         </tbody>
       </table> 
@@ -109,6 +168,7 @@
             <th>Họ tên</th>
             <th>CMND</th>
             <th>Ngày tạo</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -117,21 +177,87 @@
             <td>Phạm Duy Khánh</td>
             <td>2412315264</td>
             <td>20/04/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
           <tr>
             <td>duytran</td>
             <td>Trần Thanh Duy</td>
             <td>2411629563</td>
             <td>18/03/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
           <tr>
             <td>linhnguyen24</td>
             <td>Nguyễn Ngọc Linh</td>
             <td>2412319574</td>
             <td>29/01/2022</td>
+            <td>
+              <button 
+                class="btn btn-primary" 
+                data-bs-toggle="modal" 
+                data-bs-target="#detail" 
+                data-bs-whatever=<%= user._id %>
+              >Chi tiết</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="detail" tabindex="-1" aria-labelledby="detail" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="recipient-name" class="col-form-label">Recipient:</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="mb-3">
+            <label for="message-text" class="col-form-label">Message:</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Send message</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const detail = document.getElementById('detail')
+  detail.addEventListener('show.bs.modal', (event) => {
+    const button = event.relatedTarget
+
+    const recipient = button.getAttribute('data-bs-whatever')
+
+    const modalTitle = detail.querySelector('.modal-title')
+    const modalBodyInput = detail.querySelector('.modal-body input')
+
+    modalTitle.textContent = 'New message to ' + recipient
+    modalBodyInput.value = recipient
+  })
+</script>

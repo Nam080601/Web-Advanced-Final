@@ -1,81 +1,68 @@
 const express = require("express");
-const expressLayouts = require("express-ejs-layouts");
-const session = require("express-session");
-const mongoose = require("mongoose");
 const path = require("path");
-
-const login = require("./app/routes/login");
-const logout = require("./app/routes/logout");
-const admin = require("./app/routes/admin");
-const user = require("./app/routes/user");
-
-const auth = require("./app/middlewares/auth");
-const getResourceId = require("./app/middlewares/resourceId");
-
-const app = express();
+const expressSession = require("express-session");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const logger = require("morgan");
+const expressLayouts = require("express-ejs-layouts");
+const mongoose = require("mongoose");
+const middleware = require("./app/middleware/auth");
 
 require("dotenv").config();
 
-// View
-app.set("layout", "layouts/main");
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "/app/views"));
+const app = express();
+//Require Router
+const userRouter = require("./app/routes/user.router");
+const accountRouter = require("./app/routes/account.router");
+const adminRoutter = require("./app/routes/admin");
 
-// Middleware
-app.use(
-    session({
-        secret: "secret",
-        resave: true,
-        saveUninitialized: true,
-    })
-);
 
-app.use(express.static("public"));
+// ------------------------------------------------------------------------
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cookieParser(process.env.SIGN_COOKIE));
+app.use(cors());
 app.use(expressLayouts);
-// app.use(getResourceId);
-// app.use(auth);
+app.set("layout", "layouts/main");
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "app/views"));
+// app.use(expressSession({secret: "secret"}));
 
-// Routes
-app.use("/user", user);
-app.use("/login", login);
-app.use("/logout", logout);
-app.use("/admin", admin);
+app.use(
+  expressSession({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
-app.get("/", (req, res) => {
-    const locals = {
-        title: "Home",
-    };
-    res.render("Home", locals);
-});
+app.use(logger('tiny'));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    next(createError(404));
-});
+//Handle Router
+app.use("/", accountRouter);
+// app.use("/", middleware.requireAuth, userRouter);
+app.use("/admin", adminRoutter);
 
-// error handler
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get("env") === "development" ? err : {};
+//Handle Error
+app.use((req, res) => {
+  res.render("404", {error: " 404 Error"});
+})
 
-    // render the error page
-    res.status(err.status || 500);
-    res.render("error");
-});
+// app.use((error, req, res, next) => {
+//   res.render("404", {error: " 500 Error"});
+// })
 
-// Connect database and run server
 mongoose
-    .connect(process.env.DB_URL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => {
-        app.listen(process.env.PORT);
-        console.log(`Server running at port ${process.env.PORT}`);
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+  .connect(process.env.DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then((err) => {
+    app.listen(process.env.PORT);
+    console.log("Connect Success");
+    console.log(`Server running at port ${process.env.PORT}`);
+  })
+  .catch((err) => {
+    console.log("Connect Fail");
+  });
