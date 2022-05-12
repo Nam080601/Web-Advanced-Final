@@ -1,0 +1,34 @@
+<div class="container">
+    <div class="row pt-4 justify-content-between">
+        <div class="col-4">
+            <h2 class="text-primary">Wallet Info</h2>
+        </div>
+    </div>
+
+    <br/>
+
+    <table class="table table-hover table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Money</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (let user of data) { %>
+                <tr>
+                  <td><%= user.Name %></td>
+                  <td><%= user.money %></td>
+                </tr>
+              <% } %>
+        </tbody>
+    </table>
+
+    <div class="row">
+        <a class="btn btn-success m-2 col-2" href="/wallet/recharge"> Recharge</a>
+        <a class="btn btn-success m-2 col-2" href="wallet/withdraw"> Withdraw</a>
+        <a class="btn btn-success m-2 col-2" href="wallet/transfer"> Transfer</a>
+        <a class="btn btn-success m-2 col-2" href="wallet/phonecards"> Buy Phone Cards</a>
+        <a class="btn btn-success m-2 col-2" href="/history"> History</a>
+    </div>
+</div>

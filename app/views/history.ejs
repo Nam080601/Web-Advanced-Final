@@ -1,0 +1,34 @@
+<div class="container">
+    <div class="row pt-4 justify-content-between">
+        <div class="col-4">
+            <h2 class="text-primary">History Info</h2>
+        </div>
+    </div>
+
+    <br/>
+
+    <table class="table table-hover table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Money</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (let transaction of data) { %>
+                <tr>
+                  <td><%= transaction.type %></td>
+                  <td><%= transaction.money %></td>
+                  <td><%= transaction.date %></td>
+                  <td><%= transaction.status %></td>
+                  <td>
+                      <a class="btn btn-primary" href="#">View</a>
+                  </td>
+                </tr>
+              <% } %>
+        </tbody>
+    </table>
+</div>
