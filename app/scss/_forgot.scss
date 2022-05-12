@@ -1,0 +1,46 @@
+@use "base";
+
+.container-forgot {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: #9053c7;
+  background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+.wrap-forgot {
+  width: 400px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 75px;
+  @include base.mobile {
+    padding: 100px 80px 33px 80px;
+  }
+}
+.content-forgot {
+  width: 100%;
+  text-align: center;
+}
+.forgot {
+  &-password {
+    font-size: 24pt;
+  }
+  &-email {
+    font-size: 14pt;
+  }
+}
+.btn-forgot {
+  height: 50px;
+  width: 50px;
+  border-radius: 50% !important;
+  background-color: #a365d9;
+  color: #fff;
+  &:hover {
+    background-color: #bc88ea;
+    color: #fff;
+  }
+}

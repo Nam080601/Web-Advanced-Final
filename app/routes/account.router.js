@@ -1,34 +1,35 @@
-const express = require("express");
-const router = express.Router();
-
 //Require controller
 const accountController = require("../controllers/account.controller");
 
+// Auth
+const auth = require("../middlewares/auth");
+
 // ------------------------------------------------------------------------
-//Register
-router.get("/register", (req, res) => {
+function accountRoutes(app) {
+  //Register
+  app.get("/register", auth.loginAuth, (req, res) => {
     const locals = { title: "Đăng ký" };
-    res.render("auth/register", locals);
-});
-router.post("/register", accountController.register)
+    res.render("account/register", locals);
+  });
+  app.post("/register", accountController.register);
 
-//Login 
-router.get("/login", (req, res) => {
+  //Login
+  app.get("/login", auth.loginAuth, (req, res) => {
     const locals = { title: "Đăng nhập" };
-    res.render("auth/login", locals);
-});
-router.post("/login", accountController.login);
+    res.render("account/login", locals);
+  });
+  app.post("/login", accountController.login);
 
-//Logout
-router.get("/logout", accountController.logout);
+  //Logout
+  app.get("/logout", accountController.logout);
 
-//Reset password
-router.get("/forgot-password", (req, res) => {
+  //Reset password
+  app.get("/forgot-password", auth.loginAuth, (req, res) => {
     const locals = { title: "Khôi phục mật khẩu" };
-    res.render("auth/forgotpassword", locals);
-})
-router.post("/forgot-password", accountController.forgotPassword);
-router.post("/reset-password/:token", accountController.resetPassword);
+    res.render("account/forgotpassword", locals);
+  });
+  app.post("/forgot-password", accountController.forgotPassword);
+  app.post("/reset-password/:token", accountController.resetPassword);
+}
 
-
-module.exports = router;
+module.exports = accountRoutes;
