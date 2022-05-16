@@ -1,16 +1,17 @@
-const User = require('../models/user');
+const userModel = require('../models/user.model');
 
 class AdminController {
   index(req, res, next) {
-    User.find({})
+    userModel.find({})
       .then((user) => {
+        console.log(user);
         res.render('admin', {title: 'Admin', data: JSON.parse(JSON.stringify(user))});
       })
       .catch(next);
   }
 
-  profile(req, res, next) {
-    res.render('profile', {title: 'Profile'});
+  detail(req, res, next) {
+    res.render('user-detail', {title: 'Detail'});
   }
 }
 
