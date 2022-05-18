@@ -1,0 +1,145 @@
+<div class="container wrap">
+  <div class="text-center">
+    <div class="mb-3">
+      <p class="h1"><%= user.name %></p>
+    </div>
+  </div>
+  <ul class="nav nav-tabs nav-fill">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#personal">Thông tin</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#deal">Lịch sử giao dịch</a>
+    </li>
+  </ul>
+  <div class="tab-content wrap">
+    <div class="tab-pane container active" id="personal">
+      <div class="mb-3">
+        <p class="h5">ID: <%= user._id %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">Username: <%= user.username %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">Birthday: <%= user.birthday %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">Email: <%= user.email %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">Phone: <%= user.phone %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">Created: <%= user.createdAt %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">Status: <%= user.status %></p>
+      </div>
+      <div class="mb-3">
+        <p class="h5">CMND: </p>
+        <img src="/img/<%= user.cmnd[0] %>" height="200px">
+        <img src="/img/<%= user.cmnd[1] %>" height="200px">
+      </div>
+      <div class="float-end">
+        <% if (user.status === "đang bị khóa vô thời hạn") { %>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#func" data-bs-whatever="unclock">Mở khóa</button>
+        <% } %>
+        <% if (user.status === "chờ kích hoạt") { %>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#func" data-bs-whatever="admit">Xác Minh</button>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#func" data-bs-whatever="deny">Hủy</button>
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#func" data-bs-whatever="require">Yêu cầu bổ sung</button>
+        <% } %>
+      </div>
+    </div>
+    <div class="tab-pane container" id="deal">
+      <table class="table table-hover table-bordered table-striped" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Type</th>
+                  <th>Money</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+              <% for (let transaction of deals) { %>
+                  <tr>
+                    <td><%= transaction.type %></td>
+                    <td><%= transaction.money %></td>
+                    <td><%= transaction.date %></td>
+                    <td><%= transaction.status %></td>
+                    <td>
+                        <a class="btn btn-primary" href="/admin/deals/deal_id">View</a>
+                    </td>
+                  </tr>
+                <% } %>
+          </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="func" tabindex="-1" aria-labelledby="func" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" id="submit" class="btn btn-primary">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form class="fade" method="POST" id="act">
+  <input type="text" name="status" id="status">
+</form>
+
+<script>
+  const detail = document.getElementById('func');
+  detail.addEventListener('show.bs.modal', (event) => {
+    const button = event.relatedTarget;
+
+    const recipient = button.getAttribute('data-bs-whatever');
+
+    const modalTitle = detail.querySelector('.modal-title');
+
+    let str;
+    let statusValue;
+    switch (recipient) {
+      case 'unclock':
+        str = 'Khóa';
+        statusValue = 'đã kích hoạt';
+        break;
+      case 'admit':
+        str = 'Xác minh';
+        statusValue = 'đã kích hoạt';
+        break;
+      case 'deny':
+        str = 'Hủy';
+        statusValue = 'đang bị khóa vô thời hạn';
+        break;
+      case 'require':
+        str = 'Yêu cầu'
+        statusValue = 'chờ kích hoạt';
+        break;
+    }
+
+    modalTitle.textContent = "Bạn xác nhận muốn chọn chức năng " + str;
+
+    const submit = document.getElementById('submit');
+    submit.onclick = () => {
+      const form = document.getElementById('act');
+      const status = document.getElementById('status');
+
+      form.setAttribute('action', '/admin/users/<%= user.username %>');
+      status.setAttribute('value', statusValue);
+
+      form.submit();
+    }
+  })
+</script>
