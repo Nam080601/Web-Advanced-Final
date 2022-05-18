@@ -25,4 +25,11 @@ const chemaResetPassword = joi.object({
     confPass: joi.string().valid(joi.ref('newPass')).label('Nhập lại mật khẩu không chính xác'),
 })
 
-module.exports = {schemaRegister, chemaLogin, chemaChangePassword, chemaResetPassword};
+const schemaWithdrawMoney = joi.object({
+    card_number: joi.string().required().label('Vui lòng nhập số thẻ'),
+    expiry_date: joi.date().required().label('Vui lòng nhập ngày hết hạn'),
+    withdraw_money: joi.number().required().label("Vui lòng nhập số tiền"),
+    cvv: joi.string().required().label("Vui lòng nhập mã cvv"),
+});
+
+module.exports = {schemaRegister, chemaLogin, chemaChangePassword, chemaResetPassword, schemaWithdrawMoney};
