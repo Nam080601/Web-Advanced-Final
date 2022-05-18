@@ -8,6 +8,9 @@ Lê Tuấn Anh:
 - Bổ sung cmnd
 - Khôi phục mật khẩu
 
+Lưu Kiến Văn:
+Đã hoàn thành:
+- Rút tiền
 
 Chưa hoàn thành
 - Nạp tiền
@@ -15,8 +18,6 @@ Chưa hoàn thành
     111111 10/10/2022 411 (Không giới hạn số lần nạp và số tiền mỗi lần nạp)
     222222 11/11/2022 443 (Không giới hạn số lần nạp nhưng chỉ được nạp tối đa 1 triệu/lần )
     333333 12/12/2022 577 (Thẻ luôn hết tiền)
-
-- Rút tiền
  
 
 
