@@ -4,7 +4,6 @@
   width: 100%;
   min-height: 100vh;
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
   padding: 15px;
@@ -19,9 +18,16 @@
   overflow: hidden;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 177px 130px 33px 95px;
+  justify-content: space-around;
+  padding: 177px 95px 33px 95px;
+
+  @include base.tablet {
+    justify-content: space-around;
+    padding: 100px 80px 33px 80px;
+  }
+
   @include base.mobile {
+    justify-content: center;
     padding: 100px 80px 33px 80px;
   }
 }
@@ -29,6 +35,7 @@
 .login-pic {
   display: block;
   margin: 5% 5%;
+
   @include base.mobile {
     display: none;
   }
@@ -40,6 +47,7 @@
 
 .login-form {
   width: 290px;
+
   @include base.mobile {
     width: 100%;
   }
@@ -67,7 +75,7 @@
   margin-bottom: 10px;
 }
 
-.input {
+.input-login {
   font-size: 15px;
   line-height: 1.5;
   color: #666666;
@@ -130,6 +138,7 @@
   transition: all 0.4s;
   background-color: #a365d9;
   color: #fff;
+
   &:hover {
     background-color: #bc88ea;
     color: #fff;
@@ -138,14 +147,14 @@
 
 .txt1 {
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   color: #999999;
 }
 
 .txt2 {
   text-decoration: none;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   color: #666666;
 }
@@ -169,6 +178,7 @@
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.4s;
+
   @include base.tablet {
     visibility: visible;
     opacity: 1;

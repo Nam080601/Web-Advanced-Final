@@ -1,34 +1,27 @@
-//Require controller
+// Require controller
 const userController = require("../controllers/user.controller");
 
-//Require middleware
+// Require middleware
 const validate = require("../middlewares/validator");
-const auth = require("../middlewares/auth");
 
-// ------------------------------------------------------------------------
-//Change password
+// Routes
 function userRoutes(app) {
-  // Middlewares
-  app.use(auth.tokenAuth);
-
+  // Change password
   app.get("/change-password", (req, res) => {
     const locals = { title: "Đổi mật khẩu" };
-    res.render("auth/changePassword", locals);
+    res.render("account/change-password", locals);
   });
+  // Change password
   app.post("/change-Password", userController.changePassword);
-
-  //Get Info User
+  // Get Info User
   app.post("/get-info-user", userController.getInfoUser);
-
-  //Update CMND
+  // Update CMND
   app.post("/update-cmnd", userController.updateCMND);
-
-  //home
+  // Home
   app.get("/", (req, res) => {
     const locals = { title: "Trang chủ" };
     res.render("home", locals);
   });
-  app.get("/test", userController.test);
 }
 
 module.exports = userRoutes;

@@ -1,20 +1,79 @@
-
-<style>
-    input{
-        display: block;
-    }
-</style>
-<body>
-    
-
-<form action="/register" method="post" enctype="multipart/form-data" >
-    <input type="text" name="phone" placeholder="sdt">
-    <input type="text" name="email" placeholder="email">
-    <input type="text" name="name" placeholder="name">
-    <input type="date" name="birthday" placeholder="birthday">
-    <input type="text" name="address" placeholder="address">
-    <input type="file" name="front_cmnd" placeholder="cmnd">
-    <input type="file" name="back_cmnd" placeholder="cmnd">
-
-    <button type="submit">Register</button>
-</form>
+<div class="w-100 mx-auto">
+  <div class="container-register">
+    <div class="wrap-register">
+      <div class="navigate-register">
+        <button class="btn-back me-2" onClick="window.location='/'">
+          <i class="fa-solid fa-angle-left"></i>
+        </button>
+      </div>
+      <div class="content-register">
+        <div class="forgot-password">Đăng ký</div>
+        <form class="mt-4" id="form-forgot">
+          <div class="row">
+            <div class="col-md-6 col-sm-12">
+              <div class="label mb-1">Số điện thoại</div>
+              <div
+                class="wrap-input validate-input"
+                data-validate="Phone required"
+              >
+                <input class="form-control input" id="phone" type="number" />
+              </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+              <div class="label mb-1">Email</div>
+              <div
+                class="wrap-input validate-input"
+                data-validate="Email required"
+              >
+                <input class="form-control input" id="email" type="text" />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 col-sm-12">
+              <div class="label mb-1">Họ và tên</div>
+              <div
+                class="wrap-input validate-input"
+                data-validate="Name required"
+              >
+                <input class="form-control input" type="text" />
+              </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+              <div class="label mb-1">Ngày sinh</div>
+              <div
+                class="wrap-input validate-input"
+                data-validate="Birthday required"
+              >
+                <input
+                  class="form-control input"
+                  type="text"
+                  onfocus="(this.type = 'date')"
+                  onblur="if (!this.value) this.type = 'text'"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="label mb-1">Địa chỉ</div>
+          <div
+            class="wrap-input validate-input"
+            data-validate="Address required"
+          >
+            <input class="form-control input" type="text" />
+          </div>
+          <div class="label mb-1">CMND mặt trước</div>
+          <div class="wrap-input validate-input" data-validate="Image required">
+            <input class="form-control form-control-lg input" type="file" />
+          </div>
+          <div class="label mb-1">CMND mặt sau</div>
+          <div class="wrap-input validate-input" data-validate="Image required">
+            <input class="form-control form-control-lg input" type="file" />
+          </div>
+          <div class="mt-4">
+            <button class="btn btn-next" type="submit">Đăng ký</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

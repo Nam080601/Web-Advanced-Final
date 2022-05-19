@@ -4,10 +4,12 @@
   0% {
     top: 0;
   }
+
   50% {
     top: 0.2em;
   }
 }
+
 .error-text {
   h3 {
     color: #253858;
@@ -16,6 +18,7 @@
     font-family: "Raleway", sans-serif;
     font-size: 1.5rem;
   }
+
   p {
     margin-top: 0;
     margin-bottom: 1rem;
@@ -28,20 +31,24 @@
     font-family: "Lato", sans-serif;
   }
 }
+
 .btn-primary {
   &:hover {
     color: #fff;
     background-color: #0069d9;
     border-color: #0062cc;
   }
+
   color: #fff;
   background-color: #0069d9;
   border-color: #0062cc;
 }
+
 .btn-round {
   border-radius: 30px !important;
   text-decoration: none;
 }
+
 .btn {
   font-size: 15px;
   font-weight: 600;
@@ -65,50 +72,62 @@
   border-radius: 0.25rem;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
   &:not(:disabled) {
     &:not(.disabled) {
       cursor: pointer;
     }
   }
 }
+
 .error-content {
   padding: 70px 0;
 }
+
 .error-text {
   text-align: center;
 }
+
 .error {
   font-size: 100px !important;
   font-weight: 100;
 }
+
 .im-sheep {
   display: inline-block;
   position: relative;
   font-size: 1em;
   margin-bottom: 70px;
+
   * {
     transition: transform 0.3s;
   }
+
   .top {
     position: relative;
     top: 0;
     animation: bob 1s infinite;
   }
+
   &:hover {
     .head {
       transform: rotate(0deg);
+
       .im-eye {
         width: 1.25em;
         height: 1.25em;
+
         &:before {
           right: 30%;
         }
       }
     }
+
     .top {
       animation-play-state: paused;
     }
   }
+
   .head {
     display: inline-block;
     width: 5em;
@@ -119,6 +138,7 @@
     position: relative;
     top: 1em;
     transform: rotate(30deg);
+
     &:before {
       content: "";
       display: inline-block;
@@ -130,14 +150,17 @@
       right: -10%;
       border-radius: 50% 40%;
     }
+
     &:hover {
       .im-ear.one {
         transform: rotate(0deg);
       }
+
       .im-ear.two {
         transform: rotate(0deg);
       }
     }
+
     .im-eye {
       display: inline-block;
       width: 1em;
@@ -146,6 +169,7 @@
       background: white;
       position: absolute;
       overflow: hidden;
+
       &:before {
         content: "";
         display: inline-block;
@@ -159,14 +183,17 @@
         transition: all 0.3s;
       }
     }
+
     .im-eye.one {
       right: -2%;
       top: 1.7em;
     }
+
     .im-eye.two {
       right: 2.5em;
       top: 1.7em;
     }
+
     .im-ear {
       background: #253858;
       width: 50%;
@@ -174,17 +201,20 @@
       border-radius: 100%;
       position: absolute;
     }
+
     .im-ear.one {
       left: -10%;
       top: 5%;
       transform: rotate(-30deg);
     }
+
     .im-ear.two {
       top: 2%;
       right: -5%;
       transform: rotate(20deg);
     }
   }
+
   .body {
     display: inline-block;
     width: 7em;
@@ -195,12 +225,14 @@
     vertical-align: middle;
     margin-right: -3em;
   }
+
   .im-legs {
     display: inline-block;
     position: absolute;
     top: 80%;
     left: 10%;
     z-index: -1;
+
     .im-leg {
       display: inline-block;
       background: #141214;
@@ -209,6 +241,7 @@
       margin: 0.2em;
     }
   }
+
   &::before {
     left: 0;
     content: "";
