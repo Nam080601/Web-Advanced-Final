@@ -1,6 +1,6 @@
 <div class="container d-flex justify-content-center">
     <div class="content p-5 m-3 bg-light border border-secondary rounded">
-        <form method="post" action="">
+        <form id="form-withdraw" method="post" enctype="multipart/form-data">
             <div class="form-group my-2">
                 <label>Card number:</label>
                 <input type="text" class="form-control" id="card_number" placeholder="xxxxxx" name="card_number">
@@ -10,8 +10,8 @@
                 <input type="date" class="form-control" id="expiry_date" placeholder="Enter the expiry date" name="expiry_date">
             </div>
             <div class="form-group my-2">
-                <label>Money:</label>
-                <input type="number" class="form-control" id="withdraw_money" placeholder="" name="withdraw_money">
+                <label>Withdraw Money:</label>
+                <input type="number" class="form-control" id="withdraw_money" placeholder="" name="withdraw_money" min="0">
             </div>
             <div class="form-group my-2">
                 <label>CVV code:</label>

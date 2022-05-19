@@ -15,12 +15,10 @@
             </tr>
         </thead>
         <tbody>
-            <% for (let user of data) { %>
-                <tr>
-                  <td><%= user.Name %></td>
-                  <td><%= user.money %></td>
-                </tr>
-              <% } %>
+            <tr>
+                <td><%= data.name %></td>
+                <td><%= new Intl.NumberFormat().format(data.money) %> &nbsp;đ</td>
+            </tr>
         </tbody>
     </table>
 
