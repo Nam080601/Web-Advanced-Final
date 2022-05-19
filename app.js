@@ -9,8 +9,8 @@ const session = require("express-session");
 require("dotenv").config();
 
 const app = express();
-
-// Require Router
+//Require Router
+const adminRoutter = require("./app/routes/admin");
 const userRoutes = require("./app/routes/user.router");
 const accountRoutes = require("./app/routes/account.router");
 
@@ -38,7 +38,9 @@ app.use(
 // Authorization user
 app.use(auth.userAuth);
 
-// Handle Router
+//Handle Router
+// app.use("/", middleware.requireAuth, userRouter);
+app.use("/admin", adminRoutter);
 accountRoutes(app);
 userRoutes(app);
 

@@ -1,0 +1,155 @@
+<div class="container wrap">
+  <ul class="nav nav-tabs nav-fill">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#deal">Giao dịch</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#user">Tài khoản</a>
+    </li>
+  </ul>
+
+  <div class="tab-content container wrap">
+    <div class="tab-pane active" id="deal">
+      <table class="table table-hover" style="width:100%">
+        <thead>
+          <tr>
+            <th>username</th>
+            <th>date</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let transaction of deals) { %>
+            <tr>
+              <td><%= transaction.username %></td>
+              <td><%= transaction.createdAt %></td>
+              <td>
+                <a class="btn btn-primary" href="/admin/deals/<%= transaction.username %>">View</a>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+    <div class="tab-pane" id="user">
+      <div class="row">
+        <div class="col-2">
+          <ul class="nav nav-pills nav-fill flex-column">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" href="#act1">Chờ kích hoạt</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#act2">Đã kích hoạt</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#act3">Đã vô hiệu hóa</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#act4">Đang bị khóa</a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-10">
+          <div class="tab-content">
+            <div class="tab-pane container active" id="act1">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th>Tài khoản</th>
+                    <th>Họ tên</th>
+                    <th>Ngày tạo</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (let user of userWait) { %>
+                  <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.name %></td>
+                    <td><%= user.createdAt %></td>
+                    <td>
+                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane container fade" id="act2">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th>Tài khoản</th>
+                    <th>Họ tên</th>
+                    <th>Ngày tạo</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (let user of userAct) { %>
+                  <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.name %></td>
+                    <td><%= user.createdAt %></td>
+                    <td>
+                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane container fade" id="act3">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th>Tài khoản</th>
+                    <th>Họ tên</th>
+                    <th>Ngày tạo</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (let user of userDis) { %>
+                  <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.name %></td>
+                    <td><%= user.createdAt %></td>
+                    <td>
+                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+            <div class="tab-pane container fade" id="act4">
+              <table class="table table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th>Tài khoản</th>
+                    <th>Họ tên</th>
+                    <th>Ngày tạo</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for (let user of userLock) { %>
+                  <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.name %></td>
+                    <td><%= user.createdAt %></td>
+                    <td>
+                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
+                    </td>
+                  </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
