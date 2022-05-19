@@ -21,12 +21,17 @@ $(document).ready(() => {
       const username = $("#username").val();
       const password = $("#password").val();
 
+      let invalidInput = false;
+
       for (let i = 0; i < loginInput.length; i++) {
         if ($(loginInput[i]).val().length == 0) {
           showValidate(loginInput[i]);
-          showValidate(loginInput[i + 1]);
-          return;
+          invalidInput = true;
         }
+      }
+
+      if (invalidInput) {
+        return;
       }
 
       try {
@@ -38,12 +43,21 @@ $(document).ready(() => {
           body: JSON.stringify({ username, password }),
         });
         const data = await response.json();
-        if (data.code === 200) {
+        if (response.status === 200) {
           if (data.firstLogin) {
             location.href = "/change-password";
           } else {
             location.href = "/";
           }
+        } else {
+          $(".block-login").append("<div class='notification'></div>");
+          $(".notification").html(data.message);
+          setTimeout(() => {
+            $(".notification").addClass("hidden");
+          }, 2000);
+          setTimeout(() => {
+            $(".notification").remove();
+          }, 3000);
         }
       } catch (error) {
         console.log(error);
@@ -94,12 +108,17 @@ $(document).ready(() => {
       const expiry_date = $("#expiry_date").val();
       const withdraw_money = $("#withdraw_money").val();
       const cvv = $("#cvv").val();
-  
+
       try {
         const response = await fetch("/wallet/withdraw", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ card_number, expiry_date, withdraw_money, cvv }),
+          body: JSON.stringify({
+            card_number,
+            expiry_date,
+            withdraw_money,
+            cvv,
+          }),
         });
         const data = await response.json();
         console.log(data);
@@ -108,7 +127,9 @@ $(document).ready(() => {
           alert(data.message);
         } else {
           $(".btn").next().remove();
-          $(".btn").after(`<div class='alert alert-danger my-2'>${data.message}</div>`);
+          $(".btn").after(
+            `<div class='alert alert-danger my-2'>${data.message}</div>`
+          );
         }
       } catch (error) {
         console.log(error);

@@ -22,7 +22,8 @@
   "main": "app.js",
   "scripts": {
     "sass": "sass --watch app/scss:public/css",
-    "start": "node app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
