@@ -10,7 +10,7 @@ require("dotenv").config();
 
 const app = express();
 //Require Router
-const adminRoutter = require("./app/routes/admin");
+const adminRoutes = require("./app/routes/admin");
 const userRoutes = require("./app/routes/user.router");
 const accountRoutes = require("./app/routes/account.router");
 
@@ -36,11 +36,11 @@ app.use(
   })
 );
 // Authorization user
-app.use(auth.userAuth);
+// app.use(auth.userAuth);
 
 //Handle Router
 // app.use("/", middleware.requireAuth, userRouter);
-app.use("/admin", adminRoutter);
+app.use("/admin", adminRoutes);
 accountRoutes(app);
 userRoutes(app);
 

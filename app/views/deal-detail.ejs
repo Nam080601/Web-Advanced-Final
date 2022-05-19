@@ -1,1 +1,92 @@
-<h1>Deal detail</h1>
+<div class="container wrap">
+  <div class="text-center">
+    <div class="mb-3">
+      <p class="h1"><%= deal.username %></p>
+    </div>
+  </div>
+  <div class=" wrap">
+    <div class="mb-3">
+      <p class="h5">ID: <%= deal._id %></p>
+    </div>
+    <div class="mb-3">
+      <p class="h5">type: <%= deal.type %></p>
+    </div>
+    <div class="mb-3">
+      <p class="h5">Receiver phone: <%= user.receiver_phone_number %></p>
+    </div>
+    <div class="mb-3">
+      <p class="h5">Money: <%= user.money %></p>
+    </div>
+    <div class="mb-3">
+      <p class="h5">Date: <%= user.date %></p>
+    </div>
+    <div class="mb-3">
+      <p class="h5">Message: <%= user.message %></p>
+    </div>
+    <div class="mb-3">
+      <p class="h5">Status: <%= user.status %></p>
+    </div>
+    <div class="float-end">
+      <% if (user.status === "Pending") { %>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#funcD" data-bs-whatever="success">Đồng ý</button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#funcD" data-bs-whatever="cancelled">Không đồng ý</button>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="funcD" tabindex="-1" aria-labelledby="funcD" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" id="submit" class="btn btn-primary">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form class="fade" method="POST" id="act">
+  <input type="text" name="status" id="status">
+</form>
+
+<script>
+  const detail = document.getElementById('funcD');
+  detail.addEventListener('show.bs.modal', (event) => {
+    const button = event.relatedTarget;
+
+    const recipient = button.getAttribute('data-bs-whatever');
+
+    const modalTitle = detail.querySelector('.modal-title');
+
+    let str;
+    let statusValue;
+    switch (recipient) {
+      case 'success':
+        str = 'đồng ý';
+        statusValue = 'Success';
+        break;
+      case 'cancelled':
+        str = 'không đồng ý';
+        statusValue = 'Cancelled';
+        break;
+    }
+
+    modalTitle.textContent = "Bạn xác nhận " + str;
+
+    const submit = document.getElementById('submit');
+    submit.onclick = () => {
+      const form = document.getElementById('act');
+      const status = document.getElementById('status');
+
+      form.setAttribute('action', '/admin/deals/<%= deal.username %>/<%= deal.date %>');
+      status.setAttribute('value', statusValue);
+
+      form.submit();
+    }
+  })
+</script>
