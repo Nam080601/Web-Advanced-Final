@@ -85,4 +85,34 @@ $(document).ready(() => {
       }
     });
   }
+
+  //withdraw form
+  if (location.pathname == "/wallet/withdraw") {
+    $("#form-withdraw").submit(async (e) => {
+      e.preventDefault();
+      const card_number = $("#card_number").val();
+      const expiry_date = $("#expiry_date").val();
+      const withdraw_money = $("#withdraw_money").val();
+      const cvv = $("#cvv").val();
+  
+      try {
+        const response = await fetch("/wallet/withdraw", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ card_number, expiry_date, withdraw_money, cvv }),
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.code === 200) {
+          location.href = "/wallet";
+          alert(data.message);
+        } else {
+          $(".btn").next().remove();
+          $(".btn").after(`<div class='alert alert-danger my-2'>${data.message}</div>`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
 });

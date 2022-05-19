@@ -14,6 +14,7 @@ const userSchema = new Schema({
   firstLogin: { type: Boolean, default: true },
   unusual: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
+  money: { type: Number, default: 1000000 }
 });
 
 module.exports = mongoose.model("user", userSchema);
