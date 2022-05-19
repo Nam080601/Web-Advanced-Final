@@ -1,0 +1,6 @@
+-Validator.js:
+    +Thêm hàm schemaWithdrawMoney
+-walletController.js:
+    +Thêm chức năng rút tiền
+-models/history.js:
+    +Thêm cột username
