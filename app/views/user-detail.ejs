@@ -55,22 +55,18 @@
       <table class="table table-hover table-bordered table-striped" style="width:100%">
           <thead>
               <tr>
-                  <th>Type</th>
-                  <th>Money</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th>username</th>
+                  <th>date</th>
+                  <th></th>
               </tr>
           </thead>
           <tbody>
               <% for (let transaction of deals) { %>
                   <tr>
-                    <td><%= transaction.type %></td>
-                    <td><%= transaction.money %></td>
-                    <td><%= transaction.date %></td>
-                    <td><%= transaction.status %></td>
+                    <td><%= transaction.username %></td>
+                    <td><%= transaction.createdAt %></td>
                     <td>
-                        <a class="btn btn-primary" href="/admin/deals/deal_id">View</a>
+                        <a class="btn btn-primary" href="/admin/deals/<%= transaction.username %>">View</a>
                     </td>
                   </tr>
                 <% } %>
