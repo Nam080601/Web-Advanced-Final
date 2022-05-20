@@ -39,14 +39,17 @@ class AdminController {
   async actD(req, res, next) {
     const user = JSON.parse(JSON.stringify(await userModel.findOne({ username: req.params.username })));
     const deal = JSON.parse(JSON.stringify(await userModel.findOne({ username: req.params.username, date: req.params.date })));
-    if (user.money > deal.money) {
-      await userModel.updateOne({ username: req.params.slug}, {money: user.money - deal.money});
+    if (req.body.status === "cancelled") {
+      await userModel.updateOne({ username: req.params.username, date: req.params.date}, {status: req.body});
+    }
+    else if (user.money > deal.money) {
+      await userModel.updateOne({ username: req.params.username}, {money: user.money - deal.money});
       await userModel.updateOne({ username: req.params.username, date: req.params.date}, {status: req.body});
     }
     else {
       res.send("Tiền tài khoản không đủ");
     }
-    res.redirect('/admin/users/' + req.params.slug)
+    res.redirect('/admin')
   }
 }
 
