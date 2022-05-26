@@ -11,6 +11,16 @@ class HistoryController {
       })
       .catch(next);
   }
+
+  details(req, res, next) {
+    History.findOne({ username: req.user.username, _id: req.params.id })
+    .then((dt) => {
+      if (dt) {
+        res.render('transactionDetails', {title: 'Transaction Details', data: JSON.parse(JSON.stringify(dt))});
+      }
+      next();
+    })
+  }
 }
 
 module.exports = new HistoryController;
