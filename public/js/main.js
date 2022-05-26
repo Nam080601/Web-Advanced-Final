@@ -136,4 +136,40 @@ $(document).ready(() => {
       }
     });
   }
+  
+  //transfer form
+  if (location.pathname == "/wallet/transfer") {
+    $("#form-transfer").submit(async (e) => {
+      e.preventDefault();
+      const phone_number = $("#phone_number").val();
+      const message = $("#message").val();
+      const transfer_money = $("#transfer_money").val();
+      const fee_payer = $("#fee_payer").val();
+  
+      try {
+        const response = await fetch("/wallet/transfer", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ phone_number, transfer_money, message, fee_payer }),
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.code === 200) {
+          location.href = "/wallet";
+          alert(data.message);
+        } else {
+          $(".btn").next().remove();
+          $(".btn").after(`<div class='alert alert-danger my-2'>${data.message}</div>`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+
+  // back button
+  $('#back').click(() => {
+    history.back();
+  });
 });
