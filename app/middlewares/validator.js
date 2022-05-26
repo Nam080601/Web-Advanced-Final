@@ -32,4 +32,18 @@ const schemaWithdrawMoney = joi.object({
     cvv: joi.string().required().label("Vui lòng nhập mã cvv"),
 });
 
-module.exports = {schemaRegister, chemaLogin, chemaChangePassword, chemaResetPassword, schemaWithdrawMoney};
+const schemaTransferMoney = joi.object({
+    phone_number: joi.string().regex(/^[0-9]+$/).min(10).max(10).required().label('Số điện thoại không hợp lệ'),
+    transfer_money: joi.number().required().label('Vui lòng nhập số tiền'),
+    message: joi.string().required().label('Vui lòng nhập tin nhắn'),
+    fee_payer: joi.string().required().valid('Sender', 'Receiver').label('Thông tin người trả phí không hợp lệ'),
+});
+
+module.exports = {
+    schemaRegister,
+    chemaLogin,
+    chemaChangePassword,
+    chemaResetPassword,
+    schemaWithdrawMoney,
+    schemaTransferMoney,
+};
