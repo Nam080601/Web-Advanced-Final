@@ -11,6 +11,7 @@ Lê Tuấn Anh:
 Lưu Kiến Văn:
 Đã hoàn thành:
 - Rút tiền
+- Chuyển tiền (chưa có chức năng gửi OTP)
 
 Chưa hoàn thành
 - Nạp tiền
