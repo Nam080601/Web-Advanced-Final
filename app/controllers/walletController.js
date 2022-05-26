@@ -84,9 +84,9 @@ class WalletController {
       //check withdraw times
       const check_history = await History.find({ username: user.username, type: 'Withdraw' });
       check_history.sort((a,b) => { return new Date(b.date).getTime() - new Date(a.date).getTime() });
-      const withdraw_date_diff = Math.floor( (check_history[0].date - check_history[1].date) / (1000 * 60 * 60 * 24 ) );
-
-      if (withdraw_date_diff === 0) {
+      const withdraw_date_diff = check_history[0].date.getDate() - check_history[1].date.getDate();
+      const today = new Date().getDate()
+      if (withdraw_date_diff === 0 && today === check_history[0].date.getDate()) {
         return res
         .status(400)
         .json({ code: 400, message: "Bạn đã thực hiện 2 giao dịch hôm nay" });
@@ -131,11 +131,190 @@ class WalletController {
   }
 
   transfer(req, res, next) {
-    User.find({})
+    User.findOne({ username: req.user.username })
       .then((user) => {
         res.render('transfer', {title: 'Transfer', data: JSON.parse(JSON.stringify(user))});
       })
       .catch(next);
+  }
+
+  async transfer_post(req, res) {
+    try {
+      // check fields
+      try {
+        const result = await middleware.schemaTransferMoney.validateAsync(req.body);
+      } catch (err) {
+        return res.status(400).json({ code: 400, message: err.details[0].context.label });
+      }
+
+      let { phone_number, transfer_money, message, fee_payer } = req.body;
+      transfer_money = parseFloat(transfer_money);
+
+      if (transfer_money < 50000) {
+        return res
+        .status(400)
+        .json({ code: 400, message: "Số tiền phải lớn hơn hoặc bằng 50,000đ." });
+      }
+      if (transfer_money % 50000 !== 0){
+        return res
+        .status(400)
+        .json({ code: 400, message: "Số tiền phải là bội số của 50,000đ. Vd: 100,000đ." });
+      }
+
+      const receiver_user = await User.findOne({ phone: phone_number});
+      const sender_user = await User.findOne({ username: req.user.username });
+      if (!receiver_user) {
+        return res
+          .status(400)
+          .json({ code: 400, message: "Tài khoản không tồn tại" });
+      }
+      if (sender_user.phone === phone_number) {
+        return res
+        .status(400)
+        .json({ code: 400, message: "Không thể tự gửi tiền cho bản thân" });
+      }
+
+      //check fee_payer
+      let transfer_fee = transfer_money/100 * 5
+
+      //Sender
+      if (fee_payer === "Sender") {
+
+        let curr_money = sender_user.money;
+        if (curr_money < (transfer_money + transfer_fee)) {
+          return res
+            .status(400)
+            .json({ code: 400, message: "số tiền hiện tại không đủ" });
+        }
+
+        //if money >= 5m
+        if (transfer_money >= 5000000) {
+          const history = new History({
+            username: sender_user.username,
+            type: "Transfer",
+            receiver_phone_number: phone_number,
+            money: transfer_money,
+            message: message,
+            status: "Pending",
+          });
+          await history.save();
+          return res.status(200).json({ code: 200, message: "Thực hiện thành công, chờ admin xác minh" });
+        }
+
+        //update sender money
+        curr_money = sender_user.money - transfer_money - transfer_fee;
+
+        await User.findOneAndUpdate(
+          { username: sender_user.username },
+          { money: curr_money }
+        );
+        //update receiver money
+        await User.findOneAndUpdate(
+          { username: receiver_user.username },
+          { money: receiver_user.money + transfer_money }
+        );
+        // add sender history
+        const sender_history = new History({
+          username: sender_user.username,
+          type: "Transfer",
+          receiver_phone_number: phone_number,
+          money: transfer_money,
+          message: message,
+          status: "Success",
+        });
+        await sender_history.save();
+
+        // add receiver history
+        const receiver_history = new History({
+          username: receiver_user.username,
+          type: "Transfer",
+          receiver_phone_number: sender_user.phone, //sender phone number
+          money: transfer_money,
+          message: message,
+          status: "Success",
+        });
+        await receiver_history.save();
+        return res
+        .status(200)
+        .json({ code: 200, message: "Chuyển tiền thành công" });
+      }
+
+      //Receiver
+      if (fee_payer === "Receiver") {
+        let curr_money = sender_user.money;
+        if (curr_money < (transfer_money)) {
+          return res
+            .status(400)
+            .json({ code: 400, message: "số tiền hiện tại không đủ" });
+        }
+
+        //if money >= 5m
+        if (transfer_money >= 5000000) {
+          const history = new History({
+            username: sender_user.username,
+            type: "Transfer",
+            receiver_phone_number: phone_number,
+            money: transfer_money,
+            message: message,
+            status: "Pending",
+          });
+          await history.save();
+          return res.status(200).json({ code: 200, message: "Thực hiện thành công, chờ admin xác minh" });
+        }
+
+        //update sender money
+        curr_money = sender_user.money - transfer_money;
+
+        await User.findOneAndUpdate(
+          { username: sender_user.username },
+          { money: curr_money }
+        );
+        //update receiver money
+        await User.findOneAndUpdate(
+          { username: receiver_user.username },
+          { money: receiver_user.money + transfer_money - transfer_fee}
+        );
+        // add sender history
+        const sender_history = new History({
+          username: sender_user.username,
+          type: "Transfer",
+          receiver_phone_number: phone_number,
+          money: transfer_money,
+          message: message,
+          status: "Success",
+        });
+        await sender_history.save();
+
+        // add receiver history
+        const receiver_history = new History({
+          username: receiver_user.username,
+          type: "Transfer",
+          receiver_phone_number: sender_user.phone, //sender phone number
+          money: transfer_money,
+          message: message,
+          status: "Success",
+        });
+        await receiver_history.save();
+        return res
+        .status(200)
+        .json({ code: 200, message: "Chuyển tiền thành công" });
+      }
+
+      
+    } catch (error) {
+      return res
+      .status(400)
+      .json({ code: 400, message: "Lỗi" });
+    }
+
+  }
+
+  phonecards(req, res) {
+    res.render('phonecards', { title: 'Phone Cards' });
+  }
+
+  phonecardsDetails(req, res) {
+    res.render('phonecardsDetails', { title: 'Phone Cards Details' });
   }
 }
 

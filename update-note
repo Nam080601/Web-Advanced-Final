@@ -4,3 +4,14 @@
     +Thêm chức năng rút tiền
 -models/history.js:
     +Thêm cột username
+    
+26/05/2022
+-Validator.js:
+    +Thêm hàm schemaTransferMoney
+-walletController.js:
+    +Sửa phần kiểm tra thời gian rút tiền
+    +Thêm chức năng chuyển tiền (chưa send OTP)
+-historyController.js:
+    +thêm view chi tiết giao dịch
+-views:
+    +thêm view chi tiết giao dịch, mua card điện thoại, chi tiết card
