@@ -7,14 +7,19 @@ $(document).ready(() => {
     const thisAlert = $(loginInput).parent();
     $(thisAlert).removeClass("alert-validate");
   }
-  $(".validate-form .input").each(function () {
+  $(".input").each(function () {
+    $(this).focus(function () {
+      hideValidate(this);
+    });
+  });
+  $(".input-square").each(function () {
     $(this).focus(function () {
       hideValidate(this);
     });
   });
   // Login page
   if (location.pathname == "/login") {
-    const loginInput = $(".validate-input .input");
+    const input = $(".validate-input .input");
 
     $("#form-login").submit(async (e) => {
       e.preventDefault();
@@ -23,9 +28,9 @@ $(document).ready(() => {
 
       let invalidInput = false;
 
-      for (let i = 0; i < loginInput.length; i++) {
-        if ($(loginInput[i]).val().length == 0) {
-          showValidate(loginInput[i]);
+      for (let i = 0; i < input.length; i++) {
+        if ($(input[i]).val().length == 0) {
+          showValidate(input[i]);
           invalidInput = true;
         }
       }
@@ -50,7 +55,7 @@ $(document).ready(() => {
             location.href = "/";
           }
         } else {
-          $(".block-login").append("<div class='notification'></div>");
+          $("[class^='block']").append("<div class='notification'></div>");
           $(".notification").html(data.message);
           setTimeout(() => {
             $(".notification").addClass("hidden");
@@ -64,22 +69,81 @@ $(document).ready(() => {
       }
     });
   }
+  // Forgot password page
   if (location.pathname == "/forgot-password") {
-    const loginInput = $(".validate-input .input");
+    const input = $(".validate-input .input-square");
 
     $("#form-forgot").submit(async (e) => {
       e.preventDefault();
       const email = $("#email").val();
 
-      for (let i = 0; i < loginInput.length; i++) {
-        if ($(loginInput[i]).val().length == 0) {
-          showValidate(loginInput[i]);
-          return;
+      let invalidInput = false;
+
+      for (let i = 0; i < input.length; i++) {
+        if ($(input[i]).val().length == 0) {
+          showValidate(input[i]);
+          invalidInput = true;
         }
+      }
+
+      if (invalidInput) {
+        return;
       }
 
       try {
         const response = await fetch("/forgot-password", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        });
+        const data = await response.json();
+        if (response.status === 200) {
+          if (data.firstLogin) {
+            location.href = "/change-password";
+          } else {
+            location.href = "/";
+          }
+        } else {
+          $("[class^='block']").append("<div class='notification'></div>");
+          $(".notification").html(data.message);
+          setTimeout(() => {
+            $(".notification").addClass("hidden");
+          }, 2000);
+          setTimeout(() => {
+            $(".notification").remove();
+          }, 3000);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+  // Register page
+  if (location.pathname == "/register") {
+    const input = $(".validate-input .input-square");
+
+    $("#form-register").submit(async (e) => {
+      e.preventDefault();
+      const phone = $("#phone").val();
+      const email = $("#email").val();
+
+      let invalidInput = false;
+
+      for (let i = 0; i < input.length; i++) {
+        if ($(input[i]).val().length == 0) {
+          showValidate(input[i]);
+          invalidInput = true;
+        }
+      }
+
+      if (invalidInput) {
+        return;
+      }
+
+      try {
+        const response = await fetch("/register", {
           method: "POST",
           headers: {
             "content-type": "application/json",
@@ -93,14 +157,22 @@ $(document).ready(() => {
           } else {
             location.href = "/";
           }
+        } else {
+          $("[class^='block']").append("<div class='notification'></div>");
+          $(".notification").html(data.message);
+          setTimeout(() => {
+            $(".notification").addClass("hidden");
+          }, 2000);
+          setTimeout(() => {
+            $(".notification").remove();
+          }, 3000);
         }
       } catch (error) {
         console.log(error);
       }
     });
   }
-
-  //withdraw form
+  // Withdraw form
   if (location.pathname == "/wallet/withdraw") {
     $("#form-withdraw").submit(async (e) => {
       e.preventDefault();

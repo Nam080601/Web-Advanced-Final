@@ -1,9 +1,9 @@
-//Require models
+// Require models
 const userModel = require("../models/user.model");
 const blacklistUserModel = require("../models/blacklist.model");
 const resetTokenModel = require("../models/resetToken.model");
 
-//Require Other
+// Require Other
 const formidable = require("formidable");
 const fs = require("fs");
 const path = require("path");
@@ -11,14 +11,13 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-//Require middleware
+// Require middleware
 const middleware = require("../middlewares/validator");
 
-//Require helper
+// Require helper
 const helper = require("../helper/helper");
 
-// ----------------------------------------------------------------------------
-//Register
+// Register
 exports.register = async (req, res) => {
   const form = formidable({ multiples: true });
   form.parse(req, async (err, fields, files) => {
@@ -26,14 +25,14 @@ exports.register = async (req, res) => {
       return res.status(400).json({ code: 400, message: err.message });
     }
 
-    //Check Fields
+    // Check Fields
     try {
       const result = await middleware.schemaRegister.validateAsync(fields);
     } catch (err) {
       return res.status(400).json({ code: 400, message: err });
     }
 
-    //Check File
+    // Check File
     const front_cmnd = files.front_cmnd;
     const extFront_cmnd = front_cmnd.mimetype;
     const back_cmnd = files.back_cmnd;
@@ -128,11 +127,9 @@ exports.register = async (req, res) => {
   });
 };
 
-//Login
+// Login
 exports.login = async (req, res) => {
   try {
-    //Check Fields
-    const result = await middleware.chemaLogin.validateAsync(req.body);
     const { username, password } = req.body;
     //Locked account 1m
     if (req.session.locked != undefined && req.session.userlocked == username) {
@@ -228,58 +225,50 @@ exports.login = async (req, res) => {
   }
 };
 
-//Logout
+// Logout
 exports.logout = (req, res) => {
   res.clearCookie("auth-token");
-  return res.status(200).json({ code: 200, message: "Đã đăng xuất" });
+  return res.redirect(303, "/login");
 };
 
-//Reset Password
+// Reset Password
 exports.forgotPassword = async (req, res) => {
-  const form = formidable({ multiples: false });
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(400).json({ code: 400, message: err.message });
-    }
-    try {
-      const { email } = fields;
-      const user = await userModel.findOne({ email });
-      if (!user) {
-        return res
-          .status(400)
-          .json({ code: 400, message: "Không tìm thấy email này !" });
-      }
-      const token = jwt.sign(
-        { _id: user._id },
-        process.env.RESET_PASSWORD_KEY,
-        { expiresIn: "10m" }
-      );
-      const userReset = await resetTokenModel.findOne({ email });
-
-      if (userReset) {
-        await resetTokenModel.findOneAndUpdate(
-          { email },
-          { token, createdAt: Date.now() }
-        );
-      } else {
-        const resetToken = new resetTokenModel({
-          email,
-          token,
-        });
-        await resetToken.save();
-      }
-
-      await helper.sendEmailResetPassword(email, token);
-      return res.status(200).json({
-        code: 200,
-        message: "Link khôi phục mật khẩu đã được gửi vào email",
-      });
-    } catch (error) {
+  const { email } = req.body;
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
       return res
         .status(400)
-        .json({ code: 400, message: "Gửi link khôi phục thất bại", error });
+        .json({ code: 400, message: "Không tìm thấy email này !" });
     }
-  });
+    const token = jwt.sign({ _id: user._id }, process.env.RESET_PASSWORD_KEY, {
+      expiresIn: "10m",
+    });
+    const userReset = await resetTokenModel.findOne({ email });
+
+    if (userReset) {
+      await resetTokenModel.findOneAndUpdate(
+        { email },
+        { token, createdAt: Date.now() }
+      );
+    } else {
+      const resetToken = new resetTokenModel({
+        email,
+        token,
+      });
+      await resetToken.save();
+    }
+
+    await helper.sendEmailResetPassword(email, token);
+    return res.status(200).json({
+      code: 200,
+      message: "Link khôi phục mật khẩu đã được gửi vào email",
+    });
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ code: 400, message: "Gửi link khôi phục thất bại", error });
+  }
 };
 exports.resetPassword = async (req, res, next) => {
   const token = req.params.token;

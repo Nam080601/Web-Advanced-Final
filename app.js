@@ -10,7 +10,6 @@ require("dotenv").config();
 
 const app = express();
 //Require Router
-const adminRoutter = require("./app/routes/admin");
 const userRoutes = require("./app/routes/user.router");
 const accountRoutes = require("./app/routes/account.router");
 
@@ -19,7 +18,7 @@ const auth = require("./app/middlewares/auth");
 
 // Middlewares
 app.use(cors());
-app.use(logger("tiny"));
+app.use(logger(":method :url :status"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -39,14 +38,12 @@ app.use(
 app.use(auth.userAuth);
 
 //Handle Router
-// app.use("/", middleware.requireAuth, userRouter);
-app.use("/admin", adminRoutter);
 accountRoutes(app);
 userRoutes(app);
 
 // Handle Error
 app.use((req, res) => {
-  res.render("404", { title: "Error", error: " 404 Error" });
+  res.render("error/404.ejs", { title: "Error", error: " 404 Error" });
 });
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

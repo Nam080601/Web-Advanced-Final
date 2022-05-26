@@ -20,7 +20,7 @@ function userRoutes(app) {
   // Home
   app.get("/", (req, res) => {
     const locals = { title: "Trang chủ" };
-    res.render("home", locals);
+    res.render("wallet/home.ejs", locals);
   });
 }
 

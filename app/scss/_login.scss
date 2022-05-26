@@ -20,7 +20,7 @@
   flex-wrap: wrap;
   justify-content: space-around;
   padding: 177px 95px 33px 95px;
-
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
   @include base.tablet {
     justify-content: space-around;
     padding: 100px 80px 33px 80px;
@@ -54,10 +54,10 @@
 }
 
 .login-form-title {
-  font-size: 24px;
   color: #333333;
-  font-weight: bold;
-  line-height: 1.2;
+  font-size: 24pt;
+  font-weight: 900;
+  line-height: 1;
   text-align: center;
   width: 100%;
   display: block;
@@ -200,29 +200,4 @@
 .alert-validate:hover:before {
   visibility: visible;
   opacity: 1;
-}
-
-.notification {
-  position: absolute;
-  top: 10px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  padding: 5px 10px;
-  max-width: 400px;
-  width: fit-content;
-  color: #856404;
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  border-radius: 10px;
-  text-align: center;
-  @include base.mobile {
-    max-width: 300px;
-  }
-}
-
-.hidden {
-  visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s 1s, opacity 1s linear;
 }

@@ -13,11 +13,11 @@
 }
 
 .wrap-forgot {
-  width: 400px;
+  width: 450px;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 3px 8px 0 rgb(41 49 89 / 15%), inset 0 0 0 1px hsl(0deg 0% 100% / 10%);
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
   display: flex;
   flex-direction: column;
 }
@@ -36,8 +36,8 @@
   }
 }
 
-.forgot {
-  &-password {
-    font-size: 24pt;
-  }
+.form-title {
+  line-height: 1.2;
+  font-size: 24pt;
+  font-weight: 900;
 }

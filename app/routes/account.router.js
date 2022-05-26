@@ -1,26 +1,26 @@
-//Require controller
+// Require controller
 const accountController = require("../controllers/account.controller");
 
 // Routes
 function accountRoutes(app) {
-  //Register
+  // Register
   app.get("/register", (req, res) => {
     const locals = { title: "Đăng ký" };
     res.render("account/register", locals);
   });
   app.post("/register", accountController.register);
 
-  //Login
+  // Login
   app.get("/login", (req, res) => {
     const locals = { title: "Đăng nhập" };
     res.render("account/login", locals);
   });
   app.post("/login", accountController.login);
 
-  //Logout
+  // Logout
   app.get("/logout", accountController.logout);
 
-  //Reset password
+  // Reset password
   app.get("/forgot-password", (req, res) => {
     const locals = { title: "Khôi phục mật khẩu" };
     res.render("account/forgot-password", locals);
