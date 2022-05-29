@@ -12,22 +12,22 @@
       <p class="h5">type: <%= deal.type %></p>
     </div>
     <div class="mb-3">
-      <p class="h5">Receiver phone: <%= user.receiver_phone_number %></p>
+      <p class="h5">Receiver phone: <%= deal.receiver_phone_number %></p>
     </div>
     <div class="mb-3">
-      <p class="h5">Money: <%= user.money %></p>
+      <p class="h5">Money: <%= deal.money %></p>
     </div>
     <div class="mb-3">
-      <p class="h5">Date: <%= user.date %></p>
+      <p class="h5">Date: <%= deal.date %></p>
     </div>
     <div class="mb-3">
-      <p class="h5">Message: <%= user.message %></p>
+      <p class="h5">Message: <%= deal.message %></p>
     </div>
     <div class="mb-3">
-      <p class="h5">Status: <%= user.status %></p>
+      <p class="h5">Status: <%= deal.status %></p>
     </div>
     <div class="float-end">
-      <% if (user.status === "Pending") { %>
+      <% if (deal.status === "Pending") { %>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#funcD" data-bs-whatever="success">Đồng ý</button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#funcD" data-bs-whatever="cancelled">Không đồng ý</button>
       <% } %>
@@ -83,7 +83,7 @@
       const form = document.getElementById('act');
       const status = document.getElementById('status');
 
-      form.setAttribute('action', '/admin/deals/<%= deal.username %>/<%= deal.date %>');
+      form.setAttribute('action', '/admin/deals/<%= deal.username %>/<%= deal._id %>');
       status.setAttribute('value', statusValue);
 
       form.submit();

@@ -10,7 +10,7 @@ require("dotenv").config();
 
 const app = express();
 //Require Router
-const adminRoutes = require("./app/routes/admin");
+const adminRoutes = require("./app/routes/admin.test.js");
 const userRoutes = require("./app/routes/user.router");
 const accountRoutes = require("./app/routes/account.router");
 
