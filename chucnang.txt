@@ -11,7 +11,8 @@ Lê Tuấn Anh:
 Lưu Kiến Văn:
 Đã hoàn thành:
 - Rút tiền
-- Chuyển tiền (chưa có chức năng gửi OTP)
+- Chuyển tiền
+- Chức năng lịch sử
 
 Phan Quang Khải
 Đã hoàn thành:
