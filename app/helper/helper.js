@@ -88,8 +88,64 @@ exports.addBackList = async (user) => {
     const userBL = new blacklistUserModel({
       username: user.username,
     });
+<<<<<<< HEAD
     const saveUser = await userBL.save();
     return true;
   }
   return false;
 };
+=======
+    const mailOptions = {
+        from: "Delta E-Wallet", 
+        to: email, 
+        subject: "Khôi phục mật khẩu", 
+        html: `Nhấn vào đây để khôi phục mật khẩu (Link chỉ tồn tại trong 10 phút) ==> <a href="http://localhost:3000/reset-password/${token}">Khôi phục mật khẩu</a> `,
+    }
+    let info = await transporter.sendMail(mailOptions);
+}
+
+exports.sendEmailTransferOTP= async (email, OTP) => {
+    let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.USER_EMAIL, 
+          pass: process.env.PASS_EMAIL,
+        },
+    });
+    const mailOptions = {
+        from: "Delta E-Wallet", 
+        to: email, 
+        subject: "OTP Chuyển Tiền", 
+        html: `Mã OTP (tồn tại trong 1 phút): ${OTP}`,
+    }
+    let info = await transporter.sendMail(mailOptions);
+}
+
+exports.login_attempts = async(req, user) => {
+    if(req.session["login_attempts"] == undefined){
+        req.session["login_attempts"] = 1;
+    }else{
+        req.session["login_attempts"] += 1;
+    }
+
+    if(req.session["login_attempts"] >= 3){
+        req.session["login_attempts"] = 0;
+        await userModel.findOneAndUpdate({username: user.username}, {unusual: user.unusual + 1});
+        return true;
+    }
+    return false;
+}
+
+exports.addBackList = async(user) => {
+    if(user.unusual == 2){
+        const userBL = new blacklistUserModel({
+            username: user.username,
+        })           
+        const saveUser = await userBL.save();
+        return true;
+    }
+    return false;
+}
+>>>>>>> 3d2e5d7d8d88921d27384001736a19d99171a372

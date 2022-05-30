@@ -11,10 +11,10 @@ class AdminController {
       .sort((a, b) => (a.createdAt < b.createdAt)? 1: -1);
     const userLock = JSON.parse(JSON.stringify(await userModel.find({ status: 'đang bị khóa vô thời hạn' })));
     const deals = JSON.parse(JSON.stringify(await history.find({status: 'Pending'})))
-      .filter(elem => elem.money > 5000000)
+      .filter(elem => elem.money >= 5000000)
       .sort((a, b) => (a.date < b.date)? 1: -1);
 
-    res.render('admin', {title: 'Admin', userWait, userAct, userDis, userLock, deals});
+    res.render('admin/admin.ejs', {title: 'Admin', userWait, userAct, userDis, userLock, deals});
   }
 
   async userDetail(req, res, next) {
@@ -23,12 +23,13 @@ class AdminController {
       .filter(elem => (elem.date.substr(0, 4) == (new Date()).getFullYear() && elem.date.substr(5, 2) == ((new Date()).getMonth() + 1)))
       .sort((a, b) => (a.date < b.date)? 1: -1);
 
-    res.render('user-detail', {title: 'User Detail', user, deals});
+    res.render('admin/user-detail.ejs', {title: 'User Detail', user, deals});
   }
 
   async dealDetail(req, res, next) {
-    const deal = JSON.parse(JSON.stringify(await history.findOne({username: req.params.username, date: req.params.date})));
-    res.render('deal-detail', {title: 'Deal Detail', deal});
+    const deal = JSON.parse(JSON.stringify(await history.find({}))).filter(elem => elem._id === req.params.id)[0];
+    console.log(deal);
+    res.render('admin/deal-detail.ejs', {title: 'Deal Detail', deal});
   }
 
   async act(req, res, next) {
@@ -38,13 +39,13 @@ class AdminController {
 
   async actD(req, res, next) {
     const user = JSON.parse(JSON.stringify(await userModel.findOne({ username: req.params.username })));
-    const deal = JSON.parse(JSON.stringify(await userModel.findOne({ username: req.params.username, date: req.params.date })));
+    const deal = JSON.parse(JSON.stringify(await history.find({}))).filter(elem => elem._id === req.params.id)[0];
     if (req.body.status === "cancelled") {
-      await userModel.updateOne({ username: req.params.username, date: req.params.date}, {status: req.body});
+      await deal.updateOne({ _id: deal._id}, req.body);
     }
     else if (user.money > deal.money) {
       await userModel.updateOne({ username: req.params.username}, {money: user.money - deal.money});
-      await userModel.updateOne({ username: req.params.username, date: req.params.date}, {status: req.body});
+      await history.updateOne({ _id: deal._id}, req.body);
     }
     else {
       res.send("Tiền tài khoản không đủ");

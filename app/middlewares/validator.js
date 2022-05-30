@@ -12,6 +12,7 @@ const schemaRegister = joi.object({
   address: joi.string().required(),
 });
 
+<<<<<<< HEAD
 const chemaLogin = joi.object({
   username: joi.string().required(),
   password: joi.string().required(),
@@ -45,3 +46,20 @@ module.exports = {
   chemaResetPassword,
   schemaWithdrawMoney,
 };
+=======
+const schemaTransferMoney = joi.object({
+    phone_number: joi.string().regex(/^[0-9]+$/).min(10).max(10).required().label('Số điện thoại không hợp lệ'),
+    transfer_money: joi.number().required().label('Vui lòng nhập số tiền'),
+    message: joi.string().required().label('Vui lòng nhập tin nhắn'),
+    fee_payer: joi.string().required().valid('Sender', 'Receiver').label('Thông tin người trả phí không hợp lệ'),
+});
+
+module.exports = {
+    schemaRegister,
+    chemaLogin,
+    chemaChangePassword,
+    chemaResetPassword,
+    schemaWithdrawMoney,
+    schemaTransferMoney,
+};
+>>>>>>> 3d2e5d7d8d88921d27384001736a19d99171a372
