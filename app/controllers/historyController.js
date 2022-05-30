@@ -7,7 +7,7 @@ class HistoryController {
       .then((dt) => {
         //sort date ascending
         dt.sort((a,b) => { return new Date(b.date).getTime() - new Date(a.date).getTime() });
-        res.render('history', {title: 'History', data: JSON.parse(JSON.stringify(dt))});
+        res.render('wallet/history', {title: 'History', data: JSON.parse(JSON.stringify(dt))});
       })
       .catch(next);
   }
@@ -16,7 +16,7 @@ class HistoryController {
     History.findOne({ username: req.user.username, _id: req.params.id })
     .then((dt) => {
       if (dt) {
-        res.render('transactionDetails', {title: 'Transaction Details', data: JSON.parse(JSON.stringify(dt))});
+        res.render('wallet/transactionDetails', {title: 'Transaction Details', data: JSON.parse(JSON.stringify(dt))});
       }
       next();
     })
