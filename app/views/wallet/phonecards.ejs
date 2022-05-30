@@ -1,85 +1,83 @@
-<div class="container">
-    <div class="row pt-4 justify-content-between">
-        <div class="col-4">
-            <h2 class="text-primary">Phone cards</h2>
-        </div>
+<div class="container d-flex justify-content-center">
+    <div class="content p-5 m-3 bg-light border border-secondary rounded">
+        <form id="form-phonecards" method="post">
+            <label for="nhacungcap">Nhà cung cấp</label>
+            <select name="nhacungcap" id="nhacungcap">
+                <option value="viettel">Viettel</option>
+                <option value="mobifone">Mobifone</option>
+                <option value="vinaphone">Vinaphone</option>
+            </select>
+            <br><br>
+
+            <label for="menhgia">Mệnh giá</label>
+            <select name="menhgia" id="menhgia">
+                <option value="10000">10.000</option>
+                <option value="20000">20.000</option>
+                <option value="50000">50.000</option>
+                <option value="100000">100.000</option>
+            </select>
+            <br><br>
+
+            <label for="soluong">Số lượng</label>
+            <select name="soluong" id="soluong" >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+            <br><br>
+
+            <div>
+                <label>Phí giao dịch: </label>
+                <div class="phigiaodich" id="phigiaodich" name="phigiaodich">0</div>
+            </div>
+            
+            <div>
+                <label>Tổng tiền: </label>
+                <div class="tongtien" id="tongtien" name="tongtien">10000</div>
+            </div>
+            <button id="btn_buy" class="btn btn-primary" type="submit" class="btn btn-default">Mua</button>
+        </form>
     </div>
-    <div class="row">
-        <div class="card col m-3 p-0" id="viettel_10000" style="width: 18rem;">
-            <div id="viettel_10000" class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Viettel 10000</h5>
-                <p hidden>10000</p>
+        
+    <!-- Modal -->
+    <div class="modal fade" id="buycard" role="dialog">
+        <div class="modal-dialog">
+        
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Mua thẻ thành công</h4>
+            </div>
+
+            <div class="modal-body">
+            <div>
+                <label>Nhà cung cấp: </label>
+                <span id="nhacungcap_bought"></span>
+            </div>
+            <div>
+                <label>Mệnh giá: </label>
+                <span id="menhgia_bought"></span>
+            </div>
+            <div>
+                <label>Số lượng: </label>
+                <span id="soluong_bought">Số lượng: </span>
+            </div>
+            <div>
+                <label>Tổng giá: </label>
+                <span id="tonggia_bought">Tổng giá</span>
+            </div>
+            <div>
+                <label>Mã thẻ: </label>
+                <div id="danhsachthe">Tổng giá</div>
+            </div>
+              
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
-        <div class="card col m-3 p-0" id="viettel_20000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Viettel 20000</h5>
-                <p hidden>20000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="viettel_50000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Viettel 50000</h5>
-                <p hidden>50000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="viettel_100000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Viettel 100000</h5>
-                <p hidden>100000</p>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="card col m-3 p-0" id="mobifone_10000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Mobifone 10000</h5>
-                <p hidden>10000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="mobifone_20000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Mobifone 20000</h5>
-                <p hidden>20000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="mobifone_50000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Mobifone 50000</h5>
-                <p hidden>50000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="mobifone_100000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Mobifone 100000</h5>
-                <p hidden>100000</p>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="card col m-3 p-0" id="vinaphone_10000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Vinaphone 10000</h5>
-                <p hidden>10000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="vinaphone_20000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Vinaphone 20000</h5>
-                <p hidden>20000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="vinaphone_50000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Vinaphone 50000</h5>
-                <p hidden>50000</p>
-            </div>
-        </div>
-        <div class="card col m-3 p-0" id="vinaphone_100000" style="width: 18rem;">
-            <div class="card-body d-flex justify-content-center">
-                <h5 class="text text-dark font-weight-bold">Vinaphone 100000</h5>
-                <p hidden>100000</p>
-            </div>
+        
         </div>
     </div>
 </div>

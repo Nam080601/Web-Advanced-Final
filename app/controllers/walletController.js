@@ -19,11 +19,107 @@ class WalletController {
 
   // recharge request
   recharge(req, res, next) {
-    User.findOne({ username: req.user.username })
+    User.findOne({ username: req.user.username})
       .then((user) => {
-        res.render('recharge', {title: 'Recharge', data: JSON.parse(JSON.stringify(user))});
+        res.render('wallet/recharge', {title: 'Recharge', data: JSON.parse(JSON.stringify(user))});
       })
       .catch(next);
+  }
+  async recharge_post(req, res) {
+    try {
+      // check fields
+      console.log(req.body.card_number)
+      try {
+        const result = await middleware.schemaRechargeMoney.validateAsync(req.body);
+      } catch (err) {
+        return res.status(400).json({ code: 400, message: err.details[0].context.label });
+      }
+
+      let { card_number, expiry_date, recharge_money, cvv } = req.body;
+      recharge_money = parseFloat(recharge_money);
+
+      const user = await User.findOne({ username: req.user.username}); //fake req.user.username: '2591335824'
+      if (!user) {
+        return res
+          .status(400)
+          .json({ code: 400, message: "Tài khoản không tồn tại" });
+      }
+      //check card number(111111, 222222, 333333)
+      switch (card_number){
+        case '111111':{
+          if (expiry_date !== "2022-10-10" || cvv !== "411") {
+            return res
+            .status(400)
+            .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
+          }
+
+          let curr_money = user.money
+          let newMoney = recharge_money + curr_money
+          try{
+            await User.findByIdAndUpdate(user.id, {money:newMoney})
+          }
+          catch(error){
+            console.log(error)
+          }
+          Createhistory(res, user, recharge_money, card_number)
+          break;
+        }
+        case '222222':{
+          if (expiry_date !== "2022-11-11" || cvv !== "443") {
+            return res
+            .status(400)
+            .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
+          }
+          if (recharge_money > 1000000){
+            return res
+            .status(400)
+            .json({ code: 400, message: "Số tiền nạp tối đa là 1.000.000" });
+          }
+          let curr_money = user.money
+          let newMoney = recharge_money + curr_money
+          try{
+            await User.findByIdAndUpdate(user.id, {money:newMoney})
+          }
+          catch(error){
+            console.log(error)
+          }
+          Createhistory(res, user, recharge_money, card_number)
+          break;
+        }
+        case '333333':{
+          if (expiry_date !== "2022-12-12" || cvv !== "577") {
+            return res
+            .status(400)
+            .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
+          }
+          return res
+            .status(400)
+            .json({ code: 400, message: "Thẻ hết tiền" });
+        }
+        default:{
+          return res
+          .status(400)
+          .json({ code: 400, message: "Thẻ không được hỗ trợ." });
+        }
+      }
+      
+      if (recharge_money < 50000) {
+        return res
+        .status(400)
+        .json({ code: 400, message: "Số tiền phải lớn hơn hoặc bằng 50,000đ." });
+      }
+
+      if (recharge_money % 50000 !== 0){
+        return res
+        .status(400)
+        .json({ code: 400, message: "Số tiền phải là bội số của 50,000đ. Vd: 100,000đ." });
+      }    
+    }catch (error) {
+      console.log(error)
+      return res
+      .status(400)
+      .json({ code: 400, message: "Lỗi" });
+    }
   }
 
   // withdraw request
@@ -309,13 +405,139 @@ class WalletController {
 
   }
 
-  phonecards(req, res) {
-    res.render('phonecards', { title: 'Phone Cards' });
+  phonecards(req, res, next) {
+    User.find({})
+      .then((user) => {
+        res.render('wallet/phonecards', {title: 'Phonecards', data: JSON.parse(JSON.stringify(user))});
+      })
+      .catch(next);
   }
+  async phonecards_post(req, res) {
+    try {
+      
+      const user = await User.findOne({ username: req.user.username});  
+      if (!user) {
+        return res
+          .status(400)
+          .json({ code: 400, message: "Tài khoản không tồn tại" });
+      }
+      
+      let { nhacungcap, menhgia, soluong} = req.body;
+      let curr_money = user.money
+      let total_monney = menhgia * soluong
 
-  phonecardsDetails(req, res) {
-    res.render('phonecardsDetails', { title: 'Phone Cards Details' });
-  }
+      if(total_monney > curr_money){
+        return res
+          .status(400)
+          .json({ code: 400, message: "Số tiền trong tài khoản không đủ" });
+      }
+
+      if(total_monney < curr_money){
+        let newMoney = curr_money - total_monney
+        try{
+          await User.findByIdAndUpdate(user.id, {money:newMoney})
+        }
+        catch(error){
+          console.log(error)
+        }
+      }
+      
+      let id_card=[]
+      let code
+      if(soluong > 5){
+        return res
+          .status(400)
+          .json({ code: 400, message: "Chỉ được mua tối đa 5 thẻ" });
+      }
+      if(soluong < 1){
+        return res
+          .status(400)
+          .json({ code: 400, message: "Số lượng thẻ không hợp lệ" });
+      }
+      switch(nhacungcap){
+        case 'viettel':{
+          if(soluong>0){
+            for(let i=0; i<soluong; i++){
+              let random_card = Math.floor(Math.random() * 100001);
+              code =  '11111' + random_card 
+              id_card.push(code)
+            }
+          }
+          break;
+        }
+        case 'mobifone':{
+          if(soluong>0){
+            for(let i=0; i<soluong; i++){
+              let random_card = Math.floor(Math.random() * 100001);
+              code =  '22222' + random_card 
+              id_card.push(code)
+            }
+          }
+          break;
+        }
+        case 'vinaphone':{
+          if(soluong>0){
+            for(let i=0; i<soluong; i++){
+              let random_card = Math.floor(Math.random() * 100001);
+              code =  '33333' + random_card 
+              id_card.push(code)
+            }
+          }
+          break;
+        }
+        default:{
+          return res
+          .status(400)
+          .json({ code: 400, message: "Nhà cung cấp không hợp lệ" });
+        }
+      }
+      CreatehistoryCard(res, user, nhacungcap, menhgia, soluong, total_monney, id_card)
+      return res
+          .status(200)
+          .json({ code: 200, message: "Mua thẻ thành công", data: {nhacungcap, menhgia, soluong, total_monney, id_card} });
+    }
+    catch (error) {
+      console.log(error);
+      return res
+      .status(400)
+      .json({ code: 400, message: "Lỗi" });
+    }
+  }  
+}
+
+//add history recharge
+async function Createhistory(res, user, recharge_money, card_number){
+  const history = new History({
+  username: user.username,
+  type: "Recharge",
+  receiver_phone_number: "",
+  money: recharge_money,
+  message: card_number,
+  status: "Success",
+  });
+
+  await history.save();
+  // console.log(history)
+  // return res
+  // .status(200)
+  // .json({ code: 200, message: "Nạp tiền thành công" });
+}
+
+//add history card
+async function CreatehistoryCard(res, user, nhacungcap, menhgia, soluong, moneyBuyCards, id_card){
+  const history = new History({
+  username: user.username,
+  nhacungcap: nhacungcap,
+  menhgia: menhgia,
+  soluong: soluong,
+  type: "Buy Card",
+  money: moneyBuyCards,
+  message: id_card.toString(),
+  status: "Success",
+  });
+
+  await history.save();
+  //console.log(history)
 }
 
 module.exports = new WalletController;

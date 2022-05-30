@@ -21,6 +21,18 @@ class HistoryController {
       next();
     })
   }
+
+  cardDetails(req, res, next) {
+    console.log(req.params.id);
+    History.findOne({ username: req.user.username, _id: req.params.id}) //req.user.username, //req.params.id
+    .then((dt) => {
+      if (dt) {
+        console.log(dt);
+        return res.render('wallet/phonecardDetails', {title: 'Phone card details', data: JSON.parse(JSON.stringify(dt))});
+      }
+      next();
+    })
+  }
 }
 
 module.exports = new HistoryController;

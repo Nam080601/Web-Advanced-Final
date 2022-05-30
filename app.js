@@ -13,6 +13,7 @@ const app = express();
 const adminRoutes = require("./app/routes/admin.test.js");
 const userRoutes = require("./app/routes/user.router");
 const accountRoutes = require("./app/routes/account.router");
+const walletRoutes = require("./app/routes/wallet")
 
 // Require Middlewares
 const auth = require("./app/middlewares/auth");
@@ -37,6 +38,8 @@ app.use(
 );
 // Authorization user
 // app.use(auth.userAuth);
+
+app.use('/wallet', walletRoutes)
 
 //Handle Router
 app.use("/admin", adminRoutes);

@@ -13,12 +13,16 @@ Lưu Kiến Văn:
 - Rút tiền
 - Chuyển tiền (chưa có chức năng gửi OTP)
 
-Chưa hoàn thành
+Phan Quang Khải
+Đã hoàn thành:
 - Nạp tiền
     Thẻ tín dụng:
     111111 10/10/2022 411 (Không giới hạn số lần nạp và số tiền mỗi lần nạp)
     222222 11/11/2022 443 (Không giới hạn số lần nạp nhưng chỉ được nạp tối đa 1 triệu/lần )
     333333 12/12/2022 577 (Thẻ luôn hết tiền)
- 
+- Mua thẻ điện thoại, 5 chữ số đầu tiên là nhà mạng 
+    Viettel: 11111 
+    Mobifone: 22222
+    Vinaphone: 33333
 
 

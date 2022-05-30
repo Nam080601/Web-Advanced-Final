@@ -239,6 +239,99 @@ $(document).ready(() => {
     });
   }
 
+  //recharge form
+  if (location.pathname == "/wallet/recharge") {
+    $("#form-recharge").submit(async (e) => {
+      e.preventDefault();
+      const card_number = $("#card_number").val();
+      const expiry_date = $("#expiry_date").val();
+      const recharge_money = $("#recharge_money").val();
+      const cvv = $("#cvv").val();
+
+      try {
+        const response = await fetch("/wallet/recharge", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            card_number,
+            expiry_date,
+            recharge_money,
+            cvv,
+          }),
+        });
+        const data = await response.json();
+        console.log(data);
+        if (data.code === 200) {
+          location.href = "/wallet";
+          alert(data.message);
+        } else {
+          $(".btn").next().remove();
+          $(".btn").after(
+            `<div class='alert alert-danger my-2'>${data.message}</div>`
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  //phone cards
+  if (location.pathname == "/wallet/phonecards") {
+    let menhgia = $("#menhgia").val()
+    let soluong = $("#soluong").val()
+    let tongtien
+    console.log(menhgia, soluong);
+    $("#menhgia").change(()=> {
+      menhgia = $("#menhgia").val()
+      tongtien = menhgia * soluong
+      $('#tongtien').html(tongtien)
+      console.log(tongtien);
+    })
+
+    $("#soluong").change(()=> {
+      soluong = $("#soluong").val()
+      tongtien = menhgia * soluong
+      $('#tongtien').html(tongtien)
+    })
+
+    $("#form-phonecards").submit(async (e) => {
+
+      e.preventDefault()
+
+      let nhacungcap = $('#nhacungcap').val()
+      const response = await fetch('http://localhost:3000/wallet/phonecards', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nhacungcap, menhgia, soluong
+        })
+        
+      }).then(res => res.json())
+      .then(data => {
+        
+        if (data.code === 200) {
+          data = data.data
+          
+          $('#nhacungcap_bought').html(data.nhacungcap)
+          $('#menhgia_bought').html(data.menhgia)
+          $('#soluong_bought').html(data.soluong)
+          $('#tonggia_bought').html(data.total_monney)
+          $('#danhsachthe').html(data.id_card.join("</p>------------<p>"))
+          $('#buycard').modal('show')           
+        } else {
+          console.log(data)
+          $(".btn").next().remove();
+          $(".btn").after(
+            `<div class='alert alert-danger my-2'>${data.message}</div>`
+          );
+        }
+      })
+    })
+  }
+
 
   // back button
   $('#back').click(() => {
