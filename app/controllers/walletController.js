@@ -3,16 +3,20 @@ const formidable = require("formidable");
 //Required models
 const User = require('../models/user.model');
 const History = require('../models/history');
+const transferOTP = require('../models/transferOTP');
 
 //Required middlewares
 const middleware = require("../middlewares/validator");
+
+//Require helper
+const helper = require("../helper/helper");
 
 class WalletController {
   index(req, res, next) {
     User.findOne({ username: req.user.username })
       .then((user) => {
         //console.log(user);
-        res.render('wallet', {title: 'Wallet', data: JSON.parse(JSON.stringify(user))});
+        res.render('wallet/wallet', {title: 'Wallet', data: JSON.parse(JSON.stringify(user))});
       })
       .catch(next);
   }
@@ -126,7 +130,7 @@ class WalletController {
   withdraw(req, res, next) {
     User.findOne({ username: req.user.username })
       .then((user) => {
-        res.render('withdraw', {title: 'Withdraw', data: JSON.parse(JSON.stringify(user))});
+        res.render('wallet/withdraw', {title: 'Withdraw', data: JSON.parse(JSON.stringify(user))});
       })
       .catch(next);
   }
@@ -229,7 +233,7 @@ class WalletController {
   transfer(req, res, next) {
     User.findOne({ username: req.user.username })
       .then((user) => {
-        res.render('transfer', {title: 'Transfer', data: JSON.parse(JSON.stringify(user))});
+        res.render('wallet/transfer', {title: 'Transfer', data: JSON.parse(JSON.stringify(user))});
       })
       .catch(next);
   }
@@ -283,56 +287,21 @@ class WalletController {
             .json({ code: 400, message: "số tiền hiện tại không đủ" });
         }
 
-        //if money >= 5m
-        if (transfer_money >= 5000000) {
-          const history = new History({
-            username: sender_user.username,
-            type: "Transfer",
-            receiver_phone_number: phone_number,
-            money: transfer_money,
-            message: message,
-            status: "Pending",
-          });
-          await history.save();
-          return res.status(200).json({ code: 200, message: "Thực hiện thành công, chờ admin xác minh" });
-        }
+        const OTP = helper.generateRandomNumber(6);
+        console.log(OTP);
+        await helper.sendEmailTransferOTP(sender_user.email, OTP);
 
-        //update sender money
-        curr_money = sender_user.money - transfer_money - transfer_fee;
-
-        await User.findOneAndUpdate(
-          { username: sender_user.username },
-          { money: curr_money }
-        );
-        //update receiver money
-        await User.findOneAndUpdate(
-          { username: receiver_user.username },
-          { money: receiver_user.money + transfer_money }
-        );
-        // add sender history
-        const sender_history = new History({
-          username: sender_user.username,
-          type: "Transfer",
-          receiver_phone_number: phone_number,
+        const transfer_otp = new transferOTP({
+          sender_username: sender_user.username,
+          receiver_username: receiver_user.username,
+          fee_payer: 'Sender',
           money: transfer_money,
           message: message,
-          status: "Success",
+          createAt: Date.now(),
+          OTP: OTP,
         });
-        await sender_history.save();
-
-        // add receiver history
-        const receiver_history = new History({
-          username: receiver_user.username,
-          type: "Transfer",
-          receiver_phone_number: sender_user.phone, //sender phone number
-          money: transfer_money,
-          message: message,
-          status: "Success",
-        });
-        await receiver_history.save();
-        return res
-        .status(200)
-        .json({ code: 200, message: "Chuyển tiền thành công" });
+        await transfer_otp.save();
+        return res.status(200).json({ code: 200, message: "Mã OTP đã được gửi đến email" });
       }
 
       //Receiver
@@ -344,23 +313,81 @@ class WalletController {
             .json({ code: 400, message: "số tiền hiện tại không đủ" });
         }
 
-        //if money >= 5m
-        if (transfer_money >= 5000000) {
-          const history = new History({
-            username: sender_user.username,
-            type: "Transfer",
-            receiver_phone_number: phone_number,
-            money: transfer_money,
-            message: message,
-            status: "Pending",
-          });
-          await history.save();
-          return res.status(200).json({ code: 200, message: "Thực hiện thành công, chờ admin xác minh" });
-        }
+        const OTP = helper.generateRandomNumber(6);
+        console.log(OTP);
+        await helper.sendEmailTransferOTP(sender_user.email, OTP);
 
+        const transfer_otp = new transferOTP({
+          sender_username: sender_user.username,
+          receiver_username: receiver_user.username,
+          fee_payer: 'Receiver',
+          money: transfer_money,
+          message: message,
+          createAt: Date.now(),
+          OTP: OTP,
+        });
+        await transfer_otp.save();
+        return res.status(200).json({ code: 200, message: "Mã OTP đã được gửi đến email" });
+      }
+      
+    } catch (error) {
+      return res
+      .status(400)
+      .json({ code: 400, message: "Lỗi" });
+    }
+  }
+
+  verifyOTP(req, res) {
+    res.render('wallet/walletOTP', { title: 'Enter OTP' });
+  }
+
+  async verifyOTP_post(req, res) {
+
+    try {
+      const { OTP_number } = req.body;
+
+      if (!OTP_number || OTP_number.length !== 6) {
+        return res.status(400).json({ code: 400, message: 'OTP không hợp lệ' });
+      }
+  
+      const tmp = await transferOTP.find({ sender_username: req.user.username });
+      tmp.sort((a,b) => { return new Date(b.createAt).getTime() - new Date(a.createAt).getTime() });
+      const dt = tmp[0];
+  
+      if (!dt) {
+        return res.status(400).json({ code: 400, message: 'OTP hết hạn' });
+      }
+
+      if (new Date(dt.createAt).getTime() + 60000 < Date.now()) {
+        return res.status(400).json({ code: 400, message: 'OTP hết hạn' });
+      }
+  
+      if (OTP_number !== dt.OTP) {
+        return res.status(400).json({ code: 400, message: 'Sai OTP' });
+      }
+
+      // process transactions
+      let transfer_fee = dt.money/100 * 5;
+      const receiver_user = await User.findOne({ username: dt.receiver_username});
+      const sender_user = await User.findOne({ username: req.user.username });
+
+      if (dt.money >= 5000000) {
+        const history = new History({
+          username: sender_user.username,
+          type: "Transfer",
+          receiver_phone_number: receiver_user.phone,
+          money: dt.money,
+          message: message,
+          status: "Pending",
+        });
+        await history.save();
+        return res.status(200).json({ code: 200, message: 'Giao dịch thành công, chờ admin xử lý.' });
+      }
+
+      // Sender
+      if (dt.fee_payer === 'Sender') {
+        let curr_money = sender_user.money - dt.money - transfer_fee;
         //update sender money
-        curr_money = sender_user.money - transfer_money;
-
         await User.findOneAndUpdate(
           { username: sender_user.username },
           { money: curr_money }
@@ -368,39 +395,54 @@ class WalletController {
         //update receiver money
         await User.findOneAndUpdate(
           { username: receiver_user.username },
-          { money: receiver_user.money + transfer_money - transfer_fee}
+          { money: receiver_user.money + dt.money }
         );
-        // add sender history
-        const sender_history = new History({
-          username: sender_user.username,
-          type: "Transfer",
-          receiver_phone_number: phone_number,
-          money: transfer_money,
-          message: message,
-          status: "Success",
-        });
-        await sender_history.save();
-
-        // add receiver history
-        const receiver_history = new History({
-          username: receiver_user.username,
-          type: "Transfer",
-          receiver_phone_number: sender_user.phone, //sender phone number
-          money: transfer_money,
-          message: message,
-          status: "Success",
-        });
-        await receiver_history.save();
-        return res
-        .status(200)
-        .json({ code: 200, message: "Chuyển tiền thành công" });
+        //console.log("Update Sender Success")
       }
 
+      //Receiver
+      if (dt.fee_payer === 'Receiver') {
+        let curr_money = sender_user.money - dt.money;
+        //update sender money
+        await User.findOneAndUpdate(
+          { username: sender_user.username },
+          { money: curr_money }
+        );
+        //update receiver money
+        await User.findOneAndUpdate(
+          { username: receiver_user.username },
+          { money: receiver_user.money + dt.money - transfer_fee}
+        );
+        //console.log("Update Receiver Success")
+      }
+
+      // add sender history
+      const sender_history = new History({
+        username: sender_user.username,
+        type: "Transfer",
+        receiver_phone_number: receiver_user.phone,
+        money: dt.money,
+        message: dt.message,
+        status: "Success",
+      });
+      await sender_history.save();
+
+      // add receiver history
+      const receiver_history = new History({
+        username: receiver_user.username,
+        type: "Transfer",
+        receiver_phone_number: sender_user.phone,
+        money: dt.money,
+        message: dt.message,
+        status: "Success",
+      });
+      await receiver_history.save();
+      console.log("Add History Success")
       
+      return res.status(200).json({ code: 200, message: 'Chuyển tiền thành công' });
+
     } catch (error) {
-      return res
-      .status(400)
-      .json({ code: 400, message: "Lỗi" });
+      res.status(400).json({ code: 400, message: 'lỗi' });
     }
 
   }
