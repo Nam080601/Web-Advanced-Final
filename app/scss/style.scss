@@ -1,9 +1,21 @@
 @use "base";
 @use "login";
 @use "forgot";
+@use "change-password";
 @use "register";
 @use "home";
 @use "error";
+
+.progress-spinner {
+  display: none;
+  justify-content: center;
+  width: 100%;
+  top: 15px;
+  position: fixed;
+  .spinner-color {
+    color: #90e428 !important;
+  }
+}
 
 .label {
   text-align: left;

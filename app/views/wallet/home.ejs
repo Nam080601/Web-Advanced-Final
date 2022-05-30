@@ -1,3 +1,146 @@
 <div class="container-home">
-  <div class="block-home">Hello</div>
+  <div class="block-home">
+    <div class="block-wallet-function">
+      <img class="logo" src="/img/favicon.ico" alt="Logo" width="70" />
+      <div class="function">
+        <i class="icon fa-solid fa-house"></i>
+        <span class="mt-1">Home</span>
+      </div>
+      <div class="function">
+        <i class="icon fa-solid fa-wallet"></i>
+        <span class="mt-1">Wallet</span>
+      </div>
+      <div class="function">
+        <i class="icon fa-solid fa-user"></i>
+        <span class="mt-1">Account</span>
+      </div>
+      <i
+        class="logout fa-solid fa-arrow-right-from-bracket"
+        onClick="window.location='/logout'"
+      ></i>
+    </div>
+    <div class="block-wallet-content">
+      <div class="user-bar mb-4">
+        <div class="user-container">
+          <div class="input-group">
+            <input
+              type="text"
+              class="search-input form-control"
+              placeholder="Search"
+            />
+          </div>
+          <div class="user-block">
+            <div class="user-avatar">
+              <img src="/img/avatar.png" alt="Avatar" width="50" />
+            </div>
+            <div class="user-info">
+              <div class="user-name">
+                <% if (user) { %> <%= user.name %> <% } %>
+              </div>
+              <div class="user-role text-secondary">
+                <% if (user) { %> <%= user.role %> <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wallet-content">
+        <div class="wallet col-8">
+          <h3 class="mb-3">Thông tin tài khoản</h3>
+          <div class="d-flex">
+            <div class="money-current col-6">
+              <span class="text-secondary" style="font-size: 12pt">Số dư</span>
+              <div class="d-flex justify-content-between">
+                <h4 class="mt-3">
+                  <span style="font-size: 14pt; margin-right: 5px">VND</span>
+                  100.000
+                </h4>
+              </div>
+            </div>
+            <!-- More info about wallet -->
+          </div>
+          <h3 class="mt-4 mb-3">Lịch sử giao dịch</h3>
+          <div class="history w-100 d-flex flex-column">
+            <div class="history-header d-flex text-center">
+              <div class="col-2">STT</div>
+              <div class="col-4">Loại giao dịch</div>
+              <div class="col-2">Số tiền</div>
+              <div class="col-2">Thời gian</div>
+              <div class="col-2">Trạng thái</div>
+            </div>
+            <div class="h-rule"></div>
+            <!-- Rows data -->
+            <div class="history-data d-flex text-center py-2">
+              <div class="col-2">1</div>
+              <div class="col-4">Nạp tiền</div>
+              <div class="col-2">200.000</div>
+              <div class="col-2">1-1-2022</div>
+              <div class="col-2">Hoàn Tất</div>
+            </div>
+            <div class="history-data d-flex text-center py-2">
+              <div class="col-2">2</div>
+              <div class="col-4">Rút tiền</div>
+              <div class="col-2">100.000</div>
+              <div class="col-2">2-1-2022</div>
+              <div class="col-2">Hoàn Tất</div>
+            </div>
+            <div class="history-data d-flex text-center py-2">
+              <div class="col-2">3</div>
+              <div class="col-4">Rút tiền</div>
+              <div class="col-2">100.000</div>
+              <div class="col-2">2-1-2022</div>
+              <div class="col-2">Hoàn Tất</div>
+            </div>
+          </div>
+        </div>
+        <div class="cards col-4">
+          <span>Danh sách thẻ</span>
+          <div class="card-block" style="background-color: goldenrod">
+            <div class="d-flex justify-content-between">
+              <span class="name-card">Thẻ 1</span>
+              <img src="/img/visa.png" alt="Visa" width="60" height="20" />
+            </div>
+            <div class="d-flex flex-column">
+              <span>111111</span>
+              <div class="d-flex justify-content-between">
+                <span>10/10/2022</span>
+                <span>411</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-block" style="background-color: #0066cc">
+            <div class="d-flex justify-content-between">
+              <span class="name-card">Thẻ 2</span>
+              <img
+                src="/img/master-card.png"
+                alt="Master Card"
+                width="50"
+                height="38"
+              />
+            </div>
+            <div class="d-flex flex-column">
+              <span>222222</span>
+              <div class="d-flex justify-content-between">
+                <span>11/11/2022</span>
+                <span>443</span>
+              </div>
+            </div>
+          </div>
+          <div class="card-block" style="background-color: goldenrod">
+            <div class="d-flex justify-content-between">
+              <span class="name-card">Thẻ 3</span>
+              <img src="/img/jcb.png" alt="JCB" width="50" height="37" />
+            </div>
+            <div class="d-flex flex-column">
+              <span>333333</span>
+              <div class="d-flex justify-content-between">
+                <span>12/12/2022</span>
+                <span>577</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

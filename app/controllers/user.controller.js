@@ -12,50 +12,53 @@ const bcrypt = require("bcryptjs");
 //Require middleware
 const middleware = require("../middlewares/validator");
 
-//Require helper
+// Require helper
 const helper = require("../helper/helper");
 
-// ----------------------------------------------------------------------------
-//Change Password
+// Change Password
 exports.changePassword = async (req, res) => {
-  const form = formidable({ multiples: true });
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(400).json({ code: 400, message: err.message });
+  try {
+    // Check input
+    if (!req.body.oldPassword) {
+      await middleware.chemaChangePasswordFirst.validateAsync({
+        newPassword: req.body.newPassword,
+      });
+    } else {
+      await middleware.chemaChangePassword.validateAsync(req.body);
     }
-    try {
-      //Check fields
-      const result = await middleware.chemaChangePassword.validateAsync(fields);
-      //Change Password
-      const { newPassword, confirmPassword, oldPassword } = fields;
-      const user = await userModel.findOne({ username: req.user.username });
-      if (!user) {
-        return res
-          .status(400)
-          .json({ code: 400, message: "Tài khoản không tồn tại" });
-      }
+    const { oldPassword, newPassword } = req.body;
+
+    // Change Password
+    const user = await userModel.findOne({ username: req.user.username });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ code: 400, message: "Tài khoản không tồn tại" });
+    }
+    if (!user.firstLogin) {
       const passwordCorrect = user.password;
       const isPassword = bcrypt.compareSync(oldPassword, passwordCorrect);
       if (!isPassword) {
         return res
           .status(400)
-          .json({ code: 400, message: "Mật khẩu cũ chính xác" });
+          .json({ code: 400, message: "Mật khẩu cũ không chính xác" });
       }
-      const passwordHash = bcrypt.hashSync(newPassword, 2);
-      await userModel.findOneAndUpdate(
-        { username: req.user.username },
-        { password: passwordHash }
-      );
-
-      return res
-        .status(200)
-        .json({ code: 200, message: "Đổi mật khẩu thành công" });
-    } catch (err) {
-      return res
-        .status(400)
-        .json({ code: 400, message: "Đổi mật khẩu thất bại", error: err });
     }
-  });
+    const passwordHash = bcrypt.hashSync(newPassword, 2);
+    await userModel.findOneAndUpdate(
+      { username: req.user.username },
+      { password: passwordHash, firstLogin: false }
+    );
+    res.cookie("first-login", false, { httpOnly: true });
+    return res
+      .status(200)
+      .json({ code: 200, message: "Đổi mật khẩu thành công" });
+  } catch (err) {
+    console.log(err);
+    return res
+      .status(400)
+      .json({ code: 400, message: "Đổi mật khẩu thất bại", error: err });
+  }
 };
 
 //Get Info User

@@ -40,6 +40,7 @@ $(document).ready(() => {
       }
 
       try {
+        $(".progress-spinner").attr("style", "display: flex");
         const response = await fetch("/login", {
           method: "POST",
           headers: {
@@ -49,20 +50,14 @@ $(document).ready(() => {
         });
         const data = await response.json();
         if (response.status === 200) {
-          if (data.firstLogin) {
+          $(".progress-spinner").attr("style", "display: none");
+          if (data.data.firstLogin) {
             location.href = "/change-password";
           } else {
             location.href = "/";
           }
         } else {
-          $("[class^='block']").append("<div class='notification'></div>");
-          $(".notification").html(data.message);
-          setTimeout(() => {
-            $(".notification").addClass("hidden");
-          }, 2000);
-          setTimeout(() => {
-            $(".notification").remove();
-          }, 3000);
+          Alert(data.message);
         }
       } catch (error) {
         console.log(error);
@@ -91,6 +86,7 @@ $(document).ready(() => {
       }
 
       try {
+        $(".progress-spinner").attr("style", "display: flex");
         const response = await fetch("/forgot-password", {
           method: "POST",
           headers: {
@@ -100,20 +96,9 @@ $(document).ready(() => {
         });
         const data = await response.json();
         if (response.status === 200) {
-          if (data.firstLogin) {
-            location.href = "/change-password";
-          } else {
-            location.href = "/";
-          }
+          Alert(data.message, "/login");
         } else {
-          $("[class^='block']").append("<div class='notification'></div>");
-          $(".notification").html(data.message);
-          setTimeout(() => {
-            $(".notification").addClass("hidden");
-          }, 2000);
-          setTimeout(() => {
-            $(".notification").remove();
-          }, 3000);
+          Alert(data.message);
         }
       } catch (error) {
         console.log(error);
@@ -128,6 +113,11 @@ $(document).ready(() => {
       e.preventDefault();
       const phone = $("#phone").val();
       const email = $("#email").val();
+      const name = $("#name").val();
+      const birthday = $("#birthday").val();
+      const address = $("#address").val();
+      const cmnd_front = $("#cmnd_front")[0].files[0];
+      const cmnd_end = $("#cmnd_end")[0].files[0];
 
       let invalidInput = false;
 
@@ -142,30 +132,74 @@ $(document).ready(() => {
         return;
       }
 
+      const formData = new FormData();
+      formData.append("phone", phone);
+      formData.append("email", email);
+      formData.append("name", name);
+      formData.append("birthday", birthday);
+      formData.append("address", address);
+      formData.append("front_cmnd", cmnd_front);
+      formData.append("back_cmnd", cmnd_end);
+
       try {
+        $(".progress-spinner").attr("style", "display: flex");
         const response = await fetch("/register", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await response.json();
+        if (response.status === 200) {
+          Alert(data.message, "/login");
+        } else {
+          Alert(data.message);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+  // Change password page
+  if (location.pathname == "/change-password") {
+    const input = $(".validate-input .input-square");
+
+    $("#form-change").submit(async (e) => {
+      e.preventDefault();
+      const oldPassword = $("#oldPassword").val() || "";
+      const newPassword = $("#newPassword").val();
+      const newPassword2 = $("#newPassword2").val();
+
+      let invalidInput = false;
+
+      for (let i = 0; i < input.length; i++) {
+        if ($(input[i]).val().length == 0) {
+          showValidate(input[i]);
+          invalidInput = true;
+        }
+      }
+
+      if (invalidInput) {
+        return;
+      }
+
+      if (newPassword != newPassword2) {
+        Alert("Mật khẩu không khớp");
+        return;
+      }
+
+      try {
+        $(".progress-spinner").attr("style", "display: flex");
+        const response = await fetch("/change-password", {
           method: "POST",
           headers: {
             "content-type": "application/json",
           },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ oldPassword, newPassword }),
         });
         const data = await response.json();
-        if (data.code === 200) {
-          if (data.firstLogin) {
-            location.href = "/change-password";
-          } else {
-            location.href = "/";
-          }
+        if (response.status === 200) {
+          Alert(data.message, "/");
         } else {
-          $("[class^='block']").append("<div class='notification'></div>");
-          $(".notification").html(data.message);
-          setTimeout(() => {
-            $(".notification").addClass("hidden");
-          }, 2000);
-          setTimeout(() => {
-            $(".notification").remove();
-          }, 3000);
+          Alert(data.message);
         }
       } catch (error) {
         console.log(error);
@@ -209,3 +243,17 @@ $(document).ready(() => {
     });
   }
 });
+function Alert(message, href = "") {
+  $(".progress-spinner").attr("style", "display: none");
+  $("[class^='block']").append("<div class='notification'></div>");
+  $(".notification").html(message);
+  setTimeout(() => {
+    $(".notification").addClass("hidden");
+  }, 2000);
+  setTimeout(() => {
+    $(".notification").remove();
+    if (href) {
+      location.href = href;
+    }
+  }, 3000);
+}

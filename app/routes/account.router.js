@@ -20,12 +20,18 @@ function accountRoutes(app) {
   // Logout
   app.get("/logout", accountController.logout);
 
-  // Reset password
+  // Forgot password
   app.get("/forgot-password", (req, res) => {
-    const locals = { title: "Khôi phục mật khẩu" };
+    const locals = { title: "Quên mật khẩu" };
     res.render("account/forgot-password", locals);
   });
   app.post("/forgot-password", accountController.forgotPassword);
+
+  // Reset password
+  app.get("/reset-password/:token", (req, res) => {
+    const locals = { title: "Đặt lại mật khẩu" };
+    res.render("account/reset-password", locals);
+  });
   app.post("/reset-password/:token", accountController.resetPassword);
 }
 

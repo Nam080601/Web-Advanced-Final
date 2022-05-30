@@ -36,7 +36,7 @@ app.use(
   })
 );
 // Authorization user
-// app.use(auth.userAuth);
+app.use(auth.userAuth);
 
 //Handle Router
 app.use("/admin", adminRoutes);

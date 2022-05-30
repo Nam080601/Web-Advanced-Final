@@ -10,11 +10,12 @@ const userSchema = new Schema({
   cmnd: { type: [String], require: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  role: { type: String, required: true, default: "Customer" },
   status: { type: String, default: "chờ xác minh" },
   firstLogin: { type: Boolean, default: true },
   unusual: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
-  money: { type: Number, default: 1000000 }
+  money: { type: Number, default: 1000000 },
 });
 
 module.exports = mongoose.model("user", userSchema);

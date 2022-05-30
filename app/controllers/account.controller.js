@@ -19,7 +19,7 @@ const helper = require("../helper/helper");
 
 // Register
 exports.register = async (req, res) => {
-  const form = formidable({ multiples: true });
+  const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) {
       return res.status(400).json({ code: 400, message: err.message });
@@ -153,8 +153,8 @@ exports.login = async (req, res) => {
 
     const user = await userModel.findOne({ username });
     if (user) {
-      //Check User Exists
-      //Check Password
+      // Check User Exists
+      // Check Password
       const passwordCorrect = user.password;
       const isPassword = bcrypt.compareSync(password, passwordCorrect);
       if (!isPassword) {
@@ -176,7 +176,6 @@ exports.login = async (req, res) => {
             message: "Nhập sai mật khẩu 3 lần liên tục, bị khóa 1 phút",
           });
         }
-        // -------
         return res
           .status(400)
           .json({ code: 400, message: "Mật khẩu không chính xác" });
@@ -189,32 +188,22 @@ exports.login = async (req, res) => {
         address: user.address,
         phone: user.phone,
         cmnd: user.cmnd,
+        firstLogin: user.firstLogin,
+        role: user.role,
       };
-      let message = "";
-      let firstLogin = "";
-      if (user.firstLogin) {
-        //update firstLogin
-        await userModel.findOneAndUpdate({ username }, { firstLogin: false });
-        message = "Đăng nhập lần đầu cần đổi mật khẩu";
-        firstLogin = true;
-      } else {
-        message = "Đăng nhập thành công";
-        firstLogin = false;
-      }
       // Login success
       delete req.session.locked;
       delete req.session.login_attempts;
       delete req.session.userlocked;
       await userModel.findOneAndUpdate({ username }, { unusual: 0 });
       const token = jwt.sign(
-        { name: data.name, email: data.email, username },
+        { name: data.name, email: data.email, username, role: data.role },
         process.env.TOKEN_SECERT,
         { expiresIn: "1h" }
       );
       res.cookie("auth-token", token, { httpOnly: true });
-      return res
-        .status(200)
-        .json({ code: 200, firstLogin, message, data, token });
+      res.cookie("first-login", user.firstLogin, { httpOnly: true });
+      return res.status(200).json({ code: 200, data, token });
     } else {
       return res
         .status(400)
@@ -228,10 +217,11 @@ exports.login = async (req, res) => {
 // Logout
 exports.logout = (req, res) => {
   res.clearCookie("auth-token");
+  res.clearCookie("first-login");
   return res.redirect(303, "/login");
 };
 
-// Reset Password
+// Forgot Password
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -270,6 +260,8 @@ exports.forgotPassword = async (req, res) => {
       .json({ code: 400, message: "Gửi link khôi phục thất bại", error });
   }
 };
+
+// Reset password
 exports.resetPassword = async (req, res, next) => {
   const token = req.params.token;
   if (!token)
@@ -292,26 +284,20 @@ exports.resetPassword = async (req, res, next) => {
         .json({ code: 400, message: "Link không còn tồn tại" });
 
     // Token Valid
-    const form = formidable({ multiples: false });
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        return res.status(400).json({ code: 400, message: err.message });
-      }
-      try {
-        await middleware.chemaResetPassword.validateAsync(fields);
-        const { newPass, confPass } = fields;
-        const passwordHash = bcrypt.hashSync(newPass, 2);
-        await userModel.findOneAndUpdate(
-          { email: check.email },
-          { password: passwordHash }
-        );
-        await resetTokenModel.deleteOne({ email: check.email, token });
-        return res
-          .status(200)
-          .json({ code: 200, message: "Khôi phục mật khẩu thành công" });
-      } catch (error) {
-        return res.status(400).json({ code: 400, message: error });
-      }
-    });
+    try {
+      const { newPass } = req.body;
+      await middleware.chemaResetPassword.validateAsync(newPass);
+      const passwordHash = bcrypt.hashSync(newPass, 2);
+      await userModel.findOneAndUpdate(
+        { email: check.email },
+        { password: passwordHash }
+      );
+      await resetTokenModel.deleteOne({ email: check.email, token });
+      return res
+        .status(200)
+        .json({ code: 200, message: "Khôi phục mật khẩu thành công" });
+    } catch (error) {
+      return res.status(400).json({ code: 400, message: error });
+    }
   });
 };

@@ -8,19 +8,22 @@ const validate = require("../middlewares/validator");
 function userRoutes(app) {
   // Change password
   app.get("/change-password", (req, res) => {
-    const locals = { title: "Đổi mật khẩu" };
+    const locals = {
+      title: "Đổi mật khẩu",
+      firstLogin: req.cookies["first-login"],
+    };
     res.render("account/change-password", locals);
   });
-  // Change password
-  app.post("/change-Password", userController.changePassword);
+  app.post("/change-password", userController.changePassword);
+
   // Get Info User
   app.post("/get-info-user", userController.getInfoUser);
   // Update CMND
   app.post("/update-cmnd", userController.updateCMND);
   // Home
   app.get("/", (req, res) => {
-    const locals = { title: "Trang chủ" };
-    res.render("wallet/home.ejs", locals);
+    const locals = { title: "Trang chủ", user: req.user };
+    res.render("wallet/home", locals);
   });
 }
 
