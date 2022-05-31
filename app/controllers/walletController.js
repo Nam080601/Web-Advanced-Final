@@ -2,7 +2,7 @@ const formidable = require("formidable");
 
 //Required models
 const User = require("../models/user.model");
-const History = require("../models/history");
+const History = require("../models/history.model");
 const transferOTP = require("../models/transferOTP");
 
 //Required middlewares
@@ -12,45 +12,18 @@ const middleware = require("../middlewares/validator");
 const helper = require("../helper/helper");
 
 class WalletController {
-  index(req, res, next) {
-    User.findOne({ username: req.user.username })
-      .then((user) => {
-        //console.log(user);
-        res.render("wallet/wallet", {
-          title: "Wallet",
-          data: JSON.parse(JSON.stringify(user)),
-        });
-      })
-      .catch(next);
-  }
-
-  // recharge request
-  recharge(req, res, next) {
-    User.findOne({ username: req.user.username })
-      .then((user) => {
-        res.render("wallet/recharge", {
-          title: "Recharge",
-          data: JSON.parse(JSON.stringify(user)),
-        });
-      })
-      .catch(next);
-  }
-  async recharge_post(req, res) {
+  // Deposit request
+  async deposit(req, res) {
     try {
-      // check fields
-      console.log(req.body.card_number);
       try {
-        const result = await middleware.schemaRechargeMoney.validateAsync(
-          req.body
-        );
+        await middleware.schemaDepositMoney.validateAsync(req.body);
       } catch (err) {
         return res
           .status(400)
           .json({ code: 400, message: err.details[0].context.label });
       }
 
-      let { card_number, expiry_date, recharge_money, cvv } = req.body;
-      recharge_money = parseFloat(recharge_money);
+      const { card_number, exp_date, amount, cvv } = req.body;
 
       const user = await User.findOne({ username: req.user.username }); //fake req.user.username: '2591335824'
       if (!user) {
@@ -58,48 +31,47 @@ class WalletController {
           .status(400)
           .json({ code: 400, message: "Tài khoản không tồn tại" });
       }
-      //check card number(111111, 222222, 333333)
       switch (card_number) {
         case "111111": {
-          if (expiry_date !== "2022-10-10" || cvv !== "411") {
+          if (exp_date !== "2022-10-10" || cvv !== "411") {
             return res
               .status(400)
               .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
           }
 
           let curr_money = user.money;
-          let newMoney = recharge_money + curr_money;
+          let newMoney = Number.parseInt(amount) + Number.parseInt(curr_money);
           try {
             await User.findByIdAndUpdate(user.id, { money: newMoney });
           } catch (error) {
             console.log(error);
           }
-          Createhistory(res, user, recharge_money, card_number);
-          break;
+          await helper.CreateDepositHistory(user, amount, card_number);
+          return res.status(200).json({ message: "Nạp tiền thành công" });
         }
         case "222222": {
-          if (expiry_date !== "2022-11-11" || cvv !== "443") {
+          if (exp_date !== "2022-11-11" || cvv !== "443") {
             return res
               .status(400)
               .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
           }
-          if (recharge_money > 1000000) {
+          if (amount > 1000000) {
             return res
               .status(400)
               .json({ code: 400, message: "Số tiền nạp tối đa là 1.000.000" });
           }
           let curr_money = user.money;
-          let newMoney = recharge_money + curr_money;
+          let newMoney = Number.parseInt(amount) + Number.parseInt(curr_money);
           try {
             await User.findByIdAndUpdate(user.id, { money: newMoney });
           } catch (error) {
             console.log(error);
           }
-          Createhistory(res, user, recharge_money, card_number);
-          break;
+          await helper.CreateDepositHistory(user, amount, card_number);
+          return res.status(200).json({ message: "Nạp tiền thành công" });
         }
         case "333333": {
-          if (expiry_date !== "2022-12-12" || cvv !== "577") {
+          if (exp_date !== "2022-12-12" || cvv !== "577") {
             return res
               .status(400)
               .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
@@ -109,26 +81,8 @@ class WalletController {
         default: {
           return res
             .status(400)
-            .json({ code: 400, message: "Thẻ không được hỗ trợ." });
+            .json({ code: 400, message: "Thẻ không được hỗ trợ" });
         }
-      }
-
-      if (recharge_money < 50000) {
-        return res
-          .status(400)
-          .json({
-            code: 400,
-            message: "Số tiền phải lớn hơn hoặc bằng 50,000đ.",
-          });
-      }
-
-      if (recharge_money % 50000 !== 0) {
-        return res
-          .status(400)
-          .json({
-            code: 400,
-            message: "Số tiền phải là bội số của 50,000đ. Vd: 100,000đ.",
-          });
       }
     } catch (error) {
       console.log(error);
@@ -136,50 +90,36 @@ class WalletController {
     }
   }
 
-  // withdraw request
-  withdraw(req, res, next) {
-    User.findOne({ username: req.user.username })
-      .then((user) => {
-        res.render("wallet/withdraw", {
-          title: "Withdraw",
-          data: JSON.parse(JSON.stringify(user)),
-        });
-      })
-      .catch(next);
-  }
-  async withdraw_post(req, res) {
+  // Withdraw request
+  async withdraw(req, res) {
     try {
-      // check fields
       try {
-        const result = await middleware.schemaWithdrawMoney.validateAsync(
-          req.body
-        );
+        await middleware.schemaWithdrawMoney.validateAsync(req.body);
       } catch (err) {
         return res
           .status(400)
           .json({ code: 400, message: err.details[0].context.label });
       }
 
-      let { card_number, expiry_date, withdraw_money, cvv } = req.body;
-      withdraw_money = parseFloat(withdraw_money);
-
+      let { card_number, exp_date, amount, cvv, message } = req.body;
+      amount = Number.parseInt(amount);
       if (card_number !== "111111") {
         return res
           .status(400)
           .json({ code: 400, message: "Thẻ không được hỗ trợ." });
       }
-      if (expiry_date !== "2022-10-10" || cvv !== "411") {
+      if (exp_date !== "2022-10-10" || cvv !== "411") {
         return res
           .status(400)
           .json({ code: 400, message: "Thông tin thẻ không hợp lệ" });
       }
-      if (withdraw_money < 50000) {
+      if (amount < 50000) {
         return res.status(400).json({
           code: 400,
           message: "Số tiền phải lớn hơn hoặc bằng 50,000đ.",
         });
       }
-      if (withdraw_money % 50000 !== 0) {
+      if (amount % 50000 !== 0) {
         return res.status(400).json({
           code: 400,
           message: "Số tiền phải là bội số của 50,000đ. Vd: 100,000đ.",
@@ -192,15 +132,15 @@ class WalletController {
           .status(400)
           .json({ code: 400, message: "Tài khoản không tồn tại" });
       }
-      let withdraw_fee = (withdraw_money / 100) * 5;
+      let withdraw_fee = (amount / 100) * 5;
       let curr_money = user.money;
-      if (curr_money < withdraw_money + withdraw_fee) {
+      if (curr_money < amount + withdraw_fee) {
         return res
           .status(400)
           .json({ code: 400, message: "số tiền hiện tại không đủ" });
       }
 
-      //check withdraw times
+      // Check withdraw times
       const check_history = await History.find({
         username: user.username,
         type: "Withdraw",
@@ -208,24 +148,28 @@ class WalletController {
       check_history.sort((a, b) => {
         return new Date(b.date).getTime() - new Date(a.date).getTime();
       });
-      const withdraw_date_diff =
-        check_history[0].date.getDate() - check_history[1].date.getDate();
-      const today = new Date().getDate();
-      if (
-        withdraw_date_diff === 0 &&
-        today === check_history[0].date.getDate()
-      ) {
-        return res
-          .status(400)
-          .json({ code: 400, message: "Bạn đã thực hiện 2 giao dịch hôm nay" });
+
+      if (check_history.length > 1) {
+        const withdraw_date_diff =
+          check_history[0].date.getDate() - check_history[1].date.getDate();
+        const today = new Date().getDate();
+        if (
+          withdraw_date_diff === 0 &&
+          today === check_history[0].date.getDate()
+        ) {
+          return res.status(400).json({
+            code: 400,
+            message: "Bạn đã thực hiện 2 giao dịch hôm nay",
+          });
+        }
       }
-      if (withdraw_money >= 5000000) {
+      if (amount >= 5000000) {
         const history = new History({
           username: user.username,
           type: "Withdraw",
           receiver_phone_number: "",
-          money: withdraw_money,
-          message: "111111",
+          money: amount,
+          message: message,
           status: "Pending",
         });
         await history.save();
@@ -235,18 +179,18 @@ class WalletController {
         });
       }
 
-      curr_money = user.money - withdraw_money - withdraw_fee;
+      curr_money = user.money - amount - withdraw_fee;
       await User.findOneAndUpdate(
         { username: user.username },
         { money: curr_money }
       );
-      // add history
+      // Add history
       const history = new History({
         username: user.username,
         type: "Withdraw",
         receiver_phone_number: "",
-        money: withdraw_money,
-        message: "111111",
+        money: amount,
+        message: message,
         status: "Success",
       });
       await history.save();
@@ -254,52 +198,35 @@ class WalletController {
         .status(200)
         .json({ code: 200, message: "Rút tiền thành công" });
     } catch (error) {
+      console.log(error);
       return res.status(400).json({ code: 400, message: "Lỗi" });
     }
   }
 
-  transfer(req, res, next) {
-    User.findOne({ username: req.user.username })
-      .then((user) => {
-        res.render("wallet/transfer", {
-          title: "Transfer",
-          data: JSON.parse(JSON.stringify(user)),
-        });
-      })
-      .catch(next);
-  }
-
-  async transfer_post(req, res) {
+  async transfer(req, res) {
     try {
-      // check fields
       try {
-        const result = await middleware.schemaTransferMoney.validateAsync(
-          req.body
-        );
+        await middleware.schemaTransferMoney.validateAsync(req.body);
       } catch (err) {
         return res
           .status(400)
           .json({ code: 400, message: err.details[0].context.label });
       }
 
-      let { phone_number, transfer_money, message, fee_payer } = req.body;
-      transfer_money = parseFloat(transfer_money);
+      let { phone_number, amount, message, fee } = req.body;
+      amount = Number.parseInt(amount);
 
-      if (transfer_money < 50000) {
-        return res
-          .status(400)
-          .json({
-            code: 400,
-            message: "Số tiền phải lớn hơn hoặc bằng 50,000đ.",
-          });
+      if (amount < 50000) {
+        return res.status(400).json({
+          code: 400,
+          message: "Số tiền phải lớn hơn hoặc bằng 50,000đ.",
+        });
       }
-      if (transfer_money % 50000 !== 0) {
-        return res
-          .status(400)
-          .json({
-            code: 400,
-            message: "Số tiền phải là bội số của 50,000đ. Vd: 100,000đ.",
-          });
+      if (amount % 50000 !== 0) {
+        return res.status(400).json({
+          code: 400,
+          message: "Số tiền phải là bội số của 50,000đ. Vd: 100,000đ.",
+        });
       }
 
       const receiver_user = await User.findOne({ phone: phone_number });
@@ -316,26 +243,24 @@ class WalletController {
       }
 
       //check fee_payer
-      let transfer_fee = (transfer_money / 100) * 5;
-
+      let transfer_fee = (amount / 100) * 5;
       //Sender
-      if (fee_payer === "Sender") {
+      if (fee === "sender") {
         let curr_money = sender_user.money;
-        if (curr_money < transfer_money + transfer_fee) {
+        if (curr_money < amount + transfer_fee) {
           return res
             .status(400)
-            .json({ code: 400, message: "số tiền hiện tại không đủ" });
+            .json({ code: 400, message: "Số tiền hiện tại không đủ" });
         }
 
         const OTP = helper.generateRandomNumber(6);
-        console.log(OTP);
         await helper.sendEmailTransferOTP(sender_user.email, OTP);
 
         const transfer_otp = new transferOTP({
           sender_username: sender_user.username,
           receiver_username: receiver_user.username,
           fee_payer: "Sender",
-          money: transfer_money,
+          money: amount,
           message: message,
           createAt: Date.now(),
           OTP: OTP,
@@ -347,12 +272,12 @@ class WalletController {
       }
 
       //Receiver
-      if (fee_payer === "Receiver") {
+      if (fee === "Receiver") {
         let curr_money = sender_user.money;
-        if (curr_money < transfer_money) {
+        if (curr_money < amount) {
           return res
             .status(400)
-            .json({ code: 400, message: "số tiền hiện tại không đủ" });
+            .json({ code: 400, message: "Số tiền hiện tại không đủ" });
         }
 
         const OTP = helper.generateRandomNumber(6);
@@ -363,7 +288,7 @@ class WalletController {
           sender_username: sender_user.username,
           receiver_username: receiver_user.username,
           fee_payer: "Receiver",
-          money: transfer_money,
+          money: amount,
           message: message,
           createAt: Date.now(),
           OTP: OTP,
@@ -378,15 +303,11 @@ class WalletController {
     }
   }
 
-  verifyOTP(req, res) {
-    res.render("wallet/walletOTP", { title: "Enter OTP" });
-  }
-
-  async verifyOTP_post(req, res) {
+  async verifyOTP(req, res) {
     try {
-      const { OTP_number } = req.body;
+      const { OTP } = req.body;
 
-      if (!OTP_number || OTP_number.length !== 6) {
+      if (!OTP || OTP.length !== 6) {
         return res.status(400).json({ code: 400, message: "OTP không hợp lệ" });
       }
 
@@ -406,7 +327,7 @@ class WalletController {
         return res.status(400).json({ code: 400, message: "OTP hết hạn" });
       }
 
-      if (OTP_number !== dt.OTP) {
+      if (OTP !== dt.OTP) {
         return res.status(400).json({ code: 400, message: "Sai OTP" });
       }
 
@@ -427,12 +348,10 @@ class WalletController {
           status: "Pending",
         });
         await history.save();
-        return res
-          .status(200)
-          .json({
-            code: 200,
-            message: "Giao dịch thành công, chờ admin xử lý.",
-          });
+        return res.status(200).json({
+          code: 200,
+          message: "Giao dịch thành công, chờ admin xử lý",
+        });
       }
 
       // Sender
@@ -448,7 +367,6 @@ class WalletController {
           { username: receiver_user.username },
           { money: receiver_user.money + dt.money }
         );
-        //console.log("Update Sender Success")
       }
 
       //Receiver
@@ -464,7 +382,6 @@ class WalletController {
           { username: receiver_user.username },
           { money: receiver_user.money + dt.money - transfer_fee }
         );
-        //console.log("Update Receiver Success")
       }
 
       // add sender history
@@ -488,7 +405,6 @@ class WalletController {
         status: "Success",
       });
       await receiver_history.save();
-      console.log("Add History Success");
 
       return res
         .status(200)
@@ -498,17 +414,7 @@ class WalletController {
     }
   }
 
-  phonecards(req, res, next) {
-    User.find({})
-      .then((user) => {
-        res.render("wallet/phonecards", {
-          title: "Phonecards",
-          data: JSON.parse(JSON.stringify(user)),
-        });
-      })
-      .catch(next);
-  }
-  async phonecards_post(req, res) {
+  async phonecards(req, res) {
     try {
       const user = await User.findOne({ username: req.user.username });
       if (!user) {
@@ -585,8 +491,7 @@ class WalletController {
             .json({ code: 400, message: "Nhà cung cấp không hợp lệ" });
         }
       }
-      CreatehistoryCard(
-        res,
+      await helper.CreateBuyCardHistory(
         user,
         nhacungcap,
         menhgia,
@@ -594,61 +499,16 @@ class WalletController {
         total_monney,
         id_card
       );
-      return res
-        .status(200)
-        .json({
-          code: 200,
-          message: "Mua thẻ thành công",
-          data: { nhacungcap, menhgia, soluong, total_monney, id_card },
-        });
+      return res.status(200).json({
+        code: 200,
+        message: "Mua thẻ thành công",
+        data: { nhacungcap, menhgia, soluong, total_monney, id_card },
+      });
     } catch (error) {
       console.log(error);
       return res.status(400).json({ code: 400, message: "Lỗi" });
     }
   }
-}
-
-//add history recharge
-async function Createhistory(res, user, recharge_money, card_number) {
-  const history = new History({
-    username: user.username,
-    type: "Recharge",
-    receiver_phone_number: "",
-    money: recharge_money,
-    message: card_number,
-    status: "Success",
-  });
-
-  await history.save();
-  // console.log(history)
-  // return res
-  // .status(200)
-  // .json({ code: 200, message: "Nạp tiền thành công" });
-}
-
-//add history card
-async function CreatehistoryCard(
-  res,
-  user,
-  nhacungcap,
-  menhgia,
-  soluong,
-  moneyBuyCards,
-  id_card
-) {
-  const history = new History({
-    username: user.username,
-    nhacungcap: nhacungcap,
-    menhgia: menhgia,
-    soluong: soluong,
-    type: "Buy Card",
-    money: moneyBuyCards,
-    message: id_card.toString(),
-    status: "Success",
-  });
-
-  await history.save();
-  //console.log(history)
 }
 
 module.exports = new WalletController();

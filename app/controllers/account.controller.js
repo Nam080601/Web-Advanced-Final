@@ -131,7 +131,7 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    //Locked account 1m
+    // Locked account 1m
     if (req.session.locked != undefined && req.session.userlocked == username) {
       if (Date.now() - req.session.locked < 60 * 1000) {
         return res.status(400).json({
@@ -141,7 +141,7 @@ exports.login = async (req, res) => {
         });
       }
     }
-    //Disable account
+    // Disable account
     const userBlackList = await blacklistUserModel.findOne({ username });
     if (userBlackList) {
       return res.status(400).json({
@@ -190,17 +190,17 @@ exports.login = async (req, res) => {
         cmnd: user.cmnd,
         firstLogin: user.firstLogin,
         role: user.role,
+        money: user.money,
+        status: user.status,
       };
       // Login success
       delete req.session.locked;
       delete req.session.login_attempts;
       delete req.session.userlocked;
       await userModel.findOneAndUpdate({ username }, { unusual: 0 });
-      const token = jwt.sign(
-        { name: data.name, email: data.email, username, role: data.role },
-        process.env.TOKEN_SECERT,
-        { expiresIn: "1h" }
-      );
+      const token = jwt.sign(data, process.env.TOKEN_SECERT, {
+        expiresIn: "1h",
+      });
       res.cookie("auth-token", token, { httpOnly: true });
       res.cookie("first-login", user.firstLogin, { httpOnly: true });
       return res.status(200).json({ code: 200, data, token });
@@ -285,9 +285,9 @@ exports.resetPassword = async (req, res, next) => {
 
     // Token Valid
     try {
-      const { newPass } = req.body;
-      await middleware.chemaResetPassword.validateAsync(newPass);
-      const passwordHash = bcrypt.hashSync(newPass, 2);
+      const { newPassword } = req.body;
+      await middleware.chemaResetPassword.validateAsync({ newPassword });
+      const passwordHash = bcrypt.hashSync(newPassword, 2);
       await userModel.findOneAndUpdate(
         { email: check.email },
         { password: passwordHash }

@@ -12,7 +12,6 @@ const schemaRegister = joi.object({
   address: joi.string().required(),
 });
 
-<<<<<<< HEAD
 const chemaLogin = joi.object({
   username: joi.string().required(),
   password: joi.string().required(),
@@ -28,14 +27,46 @@ const chemaChangePasswordFirst = joi.object({
 });
 
 const chemaResetPassword = joi.object({
-  newPass: joi.string().required().label("Vui lòng điền đầy đủ"),
+  newPassword: joi.string().required().label("Vui lòng điền đầy đủ"),
+});
+
+const schemaDepositMoney = joi.object({
+  card_number: joi.string().required().label("Vui lòng nhập số thẻ"),
+  exp_date: joi.date().required().label("Vui lòng nhập ngày hết hạn"),
+  amount: joi
+    .number()
+    .min(50000)
+    .required()
+    .label("Số tiền cần lớn hơn hoặc bằng 50.000"),
+  cvv: joi.string().required().label("Vui lòng nhập mã cvv"),
 });
 
 const schemaWithdrawMoney = joi.object({
   card_number: joi.string().required().label("Vui lòng nhập số thẻ"),
-  expiry_date: joi.date().required().label("Vui lòng nhập ngày hết hạn"),
-  withdraw_money: joi.number().required().label("Vui lòng nhập số tiền"),
+  exp_date: joi.date().required().label("Vui lòng nhập ngày hết hạn"),
+  amount: joi
+    .number()
+    .min(50000)
+    .required()
+    .label("Số tiền cần lớn hơn hoặc bằng 50.000"),
   cvv: joi.string().required().label("Vui lòng nhập mã cvv"),
+  message: joi.string().required().label("Vui lòng nhập ghi chú"),
+});
+const schemaTransferMoney = joi.object({
+  phone_number: joi
+    .string()
+    .regex(/^[0-9]+$/)
+    .min(10)
+    .max(10)
+    .required()
+    .label("Số điện thoại không hợp lệ"),
+  amount: joi.number().required().label("Vui lòng nhập số tiền"),
+  message: joi.string().required().label("Vui lòng nhập tin nhắn"),
+  fee: joi
+    .string()
+    .required()
+    .valid("sender", "receiver")
+    .label("Thông tin người trả phí không hợp lệ"),
 });
 
 module.exports = {
@@ -44,22 +75,7 @@ module.exports = {
   chemaChangePassword,
   chemaChangePasswordFirst,
   chemaResetPassword,
+  schemaDepositMoney,
   schemaWithdrawMoney,
+  schemaTransferMoney,
 };
-=======
-const schemaTransferMoney = joi.object({
-    phone_number: joi.string().regex(/^[0-9]+$/).min(10).max(10).required().label('Số điện thoại không hợp lệ'),
-    transfer_money: joi.number().required().label('Vui lòng nhập số tiền'),
-    message: joi.string().required().label('Vui lòng nhập tin nhắn'),
-    fee_payer: joi.string().required().valid('Sender', 'Receiver').label('Thông tin người trả phí không hợp lệ'),
-});
-
-module.exports = {
-    schemaRegister,
-    chemaLogin,
-    chemaChangePassword,
-    chemaResetPassword,
-    schemaWithdrawMoney,
-    schemaTransferMoney,
-};
->>>>>>> 3d2e5d7d8d88921d27384001736a19d99171a372

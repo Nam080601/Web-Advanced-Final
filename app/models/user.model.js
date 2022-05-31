@@ -11,7 +11,7 @@ const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, required: true, default: "Customer" },
-  status: { type: String, default: "chờ xác minh" },
+  status: { type: String, default: "Chờ xác minh" },
   firstLogin: { type: Boolean, default: true },
   unusual: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },

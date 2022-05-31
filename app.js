@@ -10,10 +10,10 @@ require("dotenv").config();
 
 const app = express();
 //Require Router
-const adminRoutes = require("./app/routes/admin.test.js");
+const adminRoutes = require("./app/routes/admin.router");
 const userRoutes = require("./app/routes/user.router");
 const accountRoutes = require("./app/routes/account.router");
-const walletRoutes = require("./app/routes/wallet")
+const walletRoutes = require("./app/routes/wallet.router");
 
 // Require Middlewares
 const auth = require("./app/middlewares/auth");
@@ -39,12 +39,11 @@ app.use(
 // Authorization user
 app.use(auth.userAuth);
 
-app.use('/wallet', walletRoutes)
-
 //Handle Router
-app.use("/admin", adminRoutes);
 accountRoutes(app);
 userRoutes(app);
+walletRoutes(app);
+adminRoutes(app);
 
 // Handle Error
 app.use((req, res) => {

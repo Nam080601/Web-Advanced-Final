@@ -1,0 +1,66 @@
+<div class="container-home">
+  <div class="block-home show-alert">
+    <div class="block-wallet-function">
+      <img class="logo" src="/img/logo.png" alt="Logo" width="70" />
+      <div class="function" id="home" href="/">
+        <i class="icon bi bi-house"></i>
+        <span class="mt-1">Home</span>
+      </div>
+      <div class="function" id="history" href="/history">
+        <i class="icon bi bi-clock-history"></i>
+        <span class="mt-1">History</span>
+      </div>
+      <div class="function" id="account" href="/account">
+        <i class="icon bi bi-person"></i>
+        <span class="mt-1">Account</span>
+      </div>
+      <i
+        class="logout bi bi-box-arrow-right"
+        onClick="window.location='/logout'"
+      ></i>
+    </div>
+    <div class="block-wallet-content">
+      <div class="wallet-content d-block w-100">
+        <div class="wallet">
+          <h3 class="mt-4 mb-3">Lịch sử giao dịch</h3>
+          <div style="flex: 1">
+            <div class="history d-flex flex-column h-100">
+              <div class="history-header d-flex text-center">
+                <div class="col-1">STT</div>
+                <div class="col-2">Loại giao dịch</div>
+                <div class="col-2">Số tiền</div>
+                <div class="col-2">Ghi chú</div>
+                <div class="col-3">Thời gian</div>
+                <div class="col-2">Trạng thái</div>
+              </div>
+              <div class="h-rule-bottom"></div>
+              <% if (data.length == 0) { %>
+              <div class="d-flex flex-column justify-content-center h-100">
+                <div class="mb-3" align="center">
+                  <img src="/img/empty.png" alt="Empty" width="200" />
+                </div>
+                <div class="text-center">Bạn chưa thực hiện giao dịch nào</div>
+              </div>
+              <% } %> <% data.forEach((element,index,array) => { %> <% if (index
+              >= 10) return; %>
+              <div class="history-data d-flex text-center py-2">
+                <div class="col-1"><%= index+1 %></div>
+                <div class="col-2"><%= element.type %></div>
+                <div class="col-2">
+                  <%= element.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g,
+                  "."); %>
+                </div>
+                <div class="col-2"><%= element.message %></div>
+                <div class="col-3">
+                  <%= new Date(element.date).toLocaleString("vi-VN") %>
+                </div>
+                <div class="col-2"><%= element.status %></div>
+              </div>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,7 +3,7 @@
 @use "forgot";
 @use "change-password";
 @use "register";
-@use "home";
+@use "wallet";
 @use "error";
 
 .progress-spinner {
@@ -84,6 +84,10 @@
       color: #a365d9;
     }
   }
+}
+
+.modal-content {
+  border-radius: 15px;
 }
 
 input::-webkit-outer-spin-button,

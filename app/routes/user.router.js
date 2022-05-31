@@ -1,9 +1,6 @@
 // Require controller
 const userController = require("../controllers/user.controller");
 
-// Require middleware
-const validate = require("../middlewares/validator");
-
 // Routes
 function userRoutes(app) {
   // Change password
@@ -20,11 +17,6 @@ function userRoutes(app) {
   app.post("/get-info-user", userController.getInfoUser);
   // Update CMND
   app.post("/update-cmnd", userController.updateCMND);
-  // Home
-  app.get("/", (req, res) => {
-    const locals = { title: "Trang chủ", user: req.user };
-    res.render("wallet/home", locals);
-  });
 }
 
 module.exports = userRoutes;
