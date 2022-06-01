@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
-const fs = require("fs");
 require("dotenv").config();
 
 // require models
@@ -70,15 +69,17 @@ exports.login_attempts = async (req, user) => {
   if (req.session["login_attempts"] == undefined) {
     req.session["login_attempts"] = 1;
   } else {
-    req.session["login_attempts"] += 1;
+    req.session["login_attempts"]++;
   }
 
   if (req.session["login_attempts"] >= 3) {
     req.session["login_attempts"] = 0;
-    await userModel.findOneAndUpdate(
-      { username: user.username },
-      { unusual: user.unusual + 1 }
-    );
+    await userModel
+      .findOneAndUpdate(
+        { username: user.username },
+        { unusual: user.unusual + 1 }
+      )
+      .exec();
     return true;
   }
   return false;
@@ -86,10 +87,9 @@ exports.login_attempts = async (req, user) => {
 
 exports.addBackList = async (user) => {
   if (user.unusual == 2) {
-    const userBL = new blacklistUserModel({
+    await blacklistUserModel.create({
       username: user.username,
     });
-    const saveUser = await userBL.save();
     return true;
   }
   return false;

@@ -508,11 +508,6 @@
   border-bottom: 1px solid lightgray;
 }
 
-.v-rule-left {
-  margin: 10px;
-  border-left: 2px solid lightgray;
-}
-
 .history-data:hover {
   background-color: rgba(180, 255, 255, 0.5);
   cursor: pointer;

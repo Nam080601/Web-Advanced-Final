@@ -113,7 +113,6 @@ exports.register = async (req, res) => {
           fs.unlinkSync(dest); //Remove File CMND If Add User Failed
           fs.unlinkSync(dest1); //Remove File CMND If Add User Failed
           await userModel.deleteOne({ email, phone }); //Remove User If Send Email Failed
-
           return res
             .status(500)
             .json({ code: 500, message: "Gửi email thất bại", error: err });
@@ -141,7 +140,7 @@ exports.login = async (req, res) => {
         });
       }
     }
-    // Disable account
+    // Lock account
     const userBlackList = await blacklistUserModel.findOne({ username });
     if (userBlackList) {
       return res.status(400).json({
@@ -150,7 +149,20 @@ exports.login = async (req, res) => {
           "Tài khoản đã bị khóa do nhập sai mật khẩu nhiều lần, vui lòng liên hệ quản trị viên để được hỗ trợ",
       });
     }
-
+    // Disable account
+    const getuser = await userModel
+      .findOne({
+        username,
+        status: "Đã vô hiệu hoá",
+      })
+      .exec();
+    if (getuser) {
+      return res.status(400).json({
+        code: 400,
+        message:
+          "Tài khoản này đã bị vô hiệu hoá, vui lòng liên hệ tổng đài 18001008",
+      });
+    }
     const user = await userModel.findOne({ username });
     if (user) {
       // Check User Exists
@@ -158,23 +170,31 @@ exports.login = async (req, res) => {
       const passwordCorrect = user.password;
       const isPassword = bcrypt.compareSync(password, passwordCorrect);
       if (!isPassword) {
-        // Prevent user from login
-        const login_attempt = await helper.login_attempts(req, user);
-        if (login_attempt) {
-          const user1 = await userModel.findOne({ username });
-          const black_list = await helper.addBackList(user1);
-          if (black_list) {
+        if (user.role !== "Admin") {
+          // Prevent user from login
+          const login_attempt = await helper.login_attempts(req, user);
+          if (login_attempt) {
+            const user1 = await userModel.findOne({ username });
+            const black_list = await helper.addBackList(user1);
+            await userModel
+              .findOneAndUpdate(
+                { username },
+                { status: "Đang bị khóa vô thời hạn" }
+              )
+              .exec();
+            if (black_list) {
+              return res.status(400).json({
+                code: 400,
+                message: "Nhấp sai quá nhiều lần, bị khóa tài khoản",
+              });
+            }
+            req.session.locked = Date.now();
+            req.session.userlocked = username;
             return res.status(400).json({
               code: 400,
-              message: "Nhấp sai quá nhiều lần, bị khóa tài khoản",
+              message: "Nhập sai mật khẩu 3 lần liên tục, bị khóa 1 phút",
             });
           }
-          req.session.locked = Date.now();
-          req.session.userlocked = username;
-          return res.status(400).json({
-            code: 400,
-            message: "Nhập sai mật khẩu 3 lần liên tục, bị khóa 1 phút",
-          });
         }
         return res
           .status(400)

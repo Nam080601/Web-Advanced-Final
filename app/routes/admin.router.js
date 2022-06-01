@@ -1,11 +1,19 @@
 const adminController = require("../controllers/adminController");
 
 function adminRoutes(app) {
-  app.get("/admin/deals/:username/:id", adminController.actD);
-  app.get("/admin/deals/:id", adminController.dealDetail);
-  app.get("/admin/users/:slug", adminController.act);
-  app.get("/admin/users/:slug", adminController.userDetail);
   app.get("/admin", adminController.index);
+  // Xac minh
+  app.post("/admin/xac-minh", adminController.XacMinh);
+  // Bo sung
+  app.post("/admin/bo-sung", adminController.BoSung);
+  // Huy
+  app.post("/admin/huy", adminController.Huy);
+  // Mo Khoa
+  app.post("/admin/mo-khoa", adminController.MoKhoa);
+  // Dong y
+  app.post("/admin/dong-y", adminController.DongY);
+  // Tu choi
+  app.post("/admin/tu-choi", adminController.TuChoi);
 }
 
 module.exports = adminRoutes;

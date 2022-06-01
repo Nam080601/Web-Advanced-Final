@@ -49,6 +49,7 @@ $(document).ready(async () => {
           body: JSON.stringify({ username, password }),
         });
         const data = await response.json();
+        console.log(data);
         if (response.status === 200) {
           $(".progress-spinner").attr("style", "display: none");
           if (data.data.firstLogin) {
@@ -148,6 +149,7 @@ $(document).ready(async () => {
           body: formData,
         });
         const data = await response.json();
+        console.log(data);
         if (response.status === 200) {
           Alert(data.message, "/login");
         } else {
@@ -259,6 +261,10 @@ $(document).ready(async () => {
       "style",
       "background-color: rgba(255, 255, 255, 0.3)"
     );
+    // Prevent using functions with the user waiting to activate
+    if ($(".current-status").text().trim() !== "Đã xác minh") {
+      $(".money-block.hover").attr("data-bs-target", "#xac-minh-modal");
+    }
     // Form nap tien
     $("#form-nap-tien").submit(async (e) => {
       e.preventDefault();
@@ -268,6 +274,7 @@ $(document).ready(async () => {
         cvv: $("#cvv").val(),
         amount: $("#amount").val(),
       };
+      $(".progress-spinner").attr("style", "display: flex");
       const depositResponse = await fetch("/wallet/deposit", {
         headers: {
           "content-type": "application/json",
@@ -281,10 +288,10 @@ $(document).ready(async () => {
         $("#exp-date").val("");
         $("#cvv").val("");
         $("#amount").val("");
-        $(".current-money").html(
+        $(".current-money").text(
           MoneyDigit(
             Number.parseInt(
-              GetCurrentMoney($(".current-money").html().trim())
+              GetCurrentMoney($(".current-money").text().trim())
             ) + Number.parseInt(body.amount)
           )
         );
@@ -307,6 +314,7 @@ $(document).ready(async () => {
         amount: $("#w-amount").val(),
         message: $("#w-message").val(),
       };
+      $(".progress-spinner").attr("style", "display: flex");
       const withdrawResponse = await fetch("/wallet/withdraw", {
         headers: {
           "content-type": "application/json",
@@ -323,11 +331,11 @@ $(document).ready(async () => {
         $("#w-cvv").val("");
         $("#w-amount").val("");
         $("#w-message").val("");
-        $(".current-money").html(
+        $(".current-money").text(
           MoneyDigit(
             Number.parseInt(
-              GetCurrentMoney($(".current-money").html().trim())
-            ) - (isPending ? 0 : Number.parseInt(body.amount))
+              GetCurrentMoney($(".current-money").text().trim())
+            ) - (isPending ? 0 : Number.parseInt(body.amount * 1.05))
           )
         );
         Alert(data.message);
@@ -351,16 +359,19 @@ $(document).ready(async () => {
         fee: $("#t-fee").find(":selected").val(),
       };
       tmp_amount = body.amount;
-      const withdrawResponse = await fetch("/wallet/transfer", {
+      $(".progress-spinner").attr("style", "display: flex");
+      const transferResponse = await fetch("/wallet/transfer", {
         headers: {
           "content-type": "application/json",
         },
         method: "POST",
         body: JSON.stringify(body),
       });
-      const data = await withdrawResponse.json();
-      if (withdrawResponse.status == 200) {
-        $("#btn-otp").click();
+      const data = await transferResponse.json();
+      if (transferResponse.status == 200) {
+        setTimeout(() => {
+          $("#btn-otp").click();
+        }, 1000);
       }
       $("#t-phone-number").val("");
       $("#t-amount").val("");
@@ -374,30 +385,32 @@ $(document).ready(async () => {
       const body = {
         OTP: $("#otp").val(),
       };
-      const withdrawResponse = await fetch("/wallet/otp", {
+      $(".progress-spinner").attr("style", "display: flex");
+      const otpResponse = await fetch("/wallet/otp", {
         headers: {
           "content-type": "application/json",
         },
         method: "POST",
         body: JSON.stringify(body),
       });
-      const data = await withdrawResponse.json();
-      if (withdrawResponse.status == 200) {
+      const data = await otpResponse.json();
+      if (otpResponse.status == 200) {
         const isPending =
           data.message == "Giao dịch thành công, chờ admin xử lý";
-        $("#otp").val("");
-        $(".current-money").html(
+        $(".current-money").text(
           MoneyDigit(
             Number.parseInt(
-              GetCurrentMoney($(".current-money").html().trim())
-            ) - (isPending ? 0 : Number.parseInt(tmp_amount))
+              GetCurrentMoney($(".current-money").text().trim())
+            ) - (isPending ? 0 : Number.parseInt(tmp_amount * 1.05))
           )
         );
-        Alert(data.message);
       } else {
-        $("#otp").val("");
-        Alert(data.message);
+        setTimeout(() => {
+          $("#btn-otp").click();
+        }, 1000);
       }
+      $("#otp").val("");
+      Alert(data.message);
     });
     // Form Mua The
     $("#form-mua-the").submit(async (e) => {
@@ -407,6 +420,7 @@ $(document).ready(async () => {
         menhgia: $("#menhgia").find(":selected").val(),
         soluong: $("#soluong").find(":selected").val(),
       };
+      $(".progress-spinner").attr("style", "display: flex");
       const withdrawResponse = await fetch("/wallet/phonecards", {
         headers: {
           "content-type": "application/json",
@@ -419,10 +433,10 @@ $(document).ready(async () => {
         $("#nhacungcap").val("");
         $("#menhgia").val("");
         $("#soluong").val("");
-        $(".current-money").html(
+        $(".current-money").text(
           MoneyDigit(
             Number.parseInt(
-              GetCurrentMoney($(".current-money").html().trim())
+              GetCurrentMoney($(".current-money").text().trim())
             ) - Number.parseInt(body.menhgia * body.soluong)
           )
         );
@@ -446,7 +460,9 @@ $(document).ready(async () => {
             </div>
             <div class="d-flex">
               <div class="py-3 col-4">Mã thẻ:</div>
-              <div class="py-3 col-8">${data.data.id_card}</div>
+              <div class="py-3 col-8">${data.data.id_card
+                .toString()
+                .replace(",", "<br/>")}</div>
             </div>
           </div>
         `);
@@ -466,31 +482,47 @@ $(document).ready(async () => {
       "style",
       "background-color: rgba(255, 255, 255, 0.3)"
     );
+    $(".status").filter(function () {
+      if ($(this).text() == "Success") {
+        $(this).attr("style", "color: green");
+      }
+      if ($(this).text() == "Pending") {
+        $(this).attr("style", "color: blue");
+      }
+      if ($(this).text() == "Canceled") {
+        $(this).attr("style", "color: red");
+      }
+    });
     $(".history-data").click(function (e) {
       e.preventDefault();
       $("#history-detail").click();
       const data = {
         type: {
           name: "Loại GD",
-          data: $(this).children(".type").html().trim(),
+          data: $(this).children(".type").text().trim(),
         },
         money: {
           name: "Số tiền",
-          data: $(this).children(".money").html().trim(),
+          data: $(this).children(".money").text().trim(),
         },
         message: {
           name: "Ghi chú",
-          data: $(this).children(".message").html().trim(),
+          data: $(this)
+            .children(".message")
+            .text()
+            .trim()
+            .replace(",", "<br/>"),
         },
         time: {
           name: "Thời gian",
-          data: $(this).children(".time").html().trim(),
+          data: $(this).children(".time").text().trim(),
         },
         status: {
           name: "Trạng thái",
-          data: $(this).children(".status").html().trim(),
+          data: $(this).children(".status").text().trim(),
         },
       };
+      $(".history-detail-data").empty();
       $(".history-detail-data").append(`
       <div class="px-5 py-3">
         <div class="d-flex">
@@ -523,64 +555,202 @@ $(document).ready(async () => {
       "style",
       "background-color: rgba(255, 255, 255, 0.3)"
     );
-  }
-  //phone cards
-  if (location.pathname == "/wallet/phonecards") {
-    let menhgia = $("#menhgia").val();
-    let soluong = $("#soluong").val();
-    let tongtien;
-    console.log(menhgia, soluong);
-    $("#menhgia").change(() => {
-      menhgia = $("#menhgia").val();
-      tongtien = menhgia * soluong;
-      $("#tongtien").html(tongtien);
-      console.log(tongtien);
-    });
-
-    $("#soluong").change(() => {
-      soluong = $("#soluong").val();
-      tongtien = menhgia * soluong;
-      $("#tongtien").html(tongtien);
-    });
-
-    $("#form-phonecards").submit(async (e) => {
+    $("#form-bo-sung").submit(async function (e) {
       e.preventDefault();
+      const formData = new FormData();
+      formData.append("front_cmnd", $("#cmnd_front")[0].files[0]);
+      formData.append("back_cmnd", $("#cmnd_end")[0].files[0]);
 
-      let nhacungcap = $("#nhacungcap").val();
-      const response = await fetch("http://localhost:3000/wallet/phonecards", {
-        method: "post",
+      $(".progress-spinner").attr("style", "display: flex");
+      const bosungResponse = await fetch("/update-cmnd", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await bosungResponse.json();
+      if (bosungResponse.status === 200) {
+        $(".user-status").text("Chờ xác minh");
+        $(".btn-cmnd").css("display", "none");
+      }
+      $("#cmnd_front").val("");
+      $("#cmnd_end").val("");
+      Alert(data.message);
+    });
+  }
+  // Admin page
+  if (location.pathname == "/admin") {
+    $(".btn-xac-minh").click(async function (e) {
+      $("#user-xac-minh").text($(this).attr("user"));
+      $("#username").val($(this).attr("user"));
+    });
+    $(".btn-bo-sung").click(async function (e) {
+      $("#user-bo-sung").text($(this).attr("user"));
+      $("#username").val($(this).attr("user"));
+    });
+    $(".btn-huy").click(async function (e) {
+      $("#user-huy").text($(this).attr("user"));
+      $("#username").val($(this).attr("user"));
+    });
+    $(".btn-mo-khoa").click(async function (e) {
+      $("#user-mo-khoa").text($(this).attr("user"));
+      $("#username").val($(this).attr("user"));
+    });
+    $("#form-xac-minh").submit(async function (e) {
+      e.preventDefault();
+      const body = {
+        username: $("#username").val(),
+      };
+      $(".progress-spinner").attr("style", "display: flex");
+      const xacminhResponse = await fetch("/admin/xac-minh", {
+        method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "content-type": "application/json",
         },
-        body: JSON.stringify({
-          nhacungcap,
-          menhgia,
-          soluong,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.code === 200) {
-            data = data.data;
-
-            $("#nhacungcap_bought").html(data.nhacungcap);
-            $("#menhgia_bought").html(data.menhgia);
-            $("#soluong_bought").html(data.soluong);
-            $("#tonggia_bought").html(data.total_monney);
-            $("#danhsachthe").html(data.id_card.join("</p>------------<p>"));
-            $("#buycard").modal("show");
-          } else {
-            console.log(data);
-            $(".btn").next().remove();
-            $(".btn").after(
-              `<div class='alert alert-danger my-2'>${data.message}</div>`
-            );
-          }
-        });
+        body: JSON.stringify(body),
+      });
+      const data = await xacminhResponse.json();
+      if (xacminhResponse.status === 200) {
+        Alert(data.message, "/admin");
+      } else {
+        Alert(data.message);
+      }
+    });
+    $("#form-bo-sung").submit(async function (e) {
+      e.preventDefault();
+      const body = {
+        username: $("#username").val(),
+      };
+      $(".progress-spinner").attr("style", "display: flex");
+      const bosungResponse = await fetch("/admin/bo-sung", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await bosungResponse.json();
+      if (bosungResponse.status === 200) {
+        Alert(data.message, "/admin");
+      } else {
+        Alert(data.message);
+      }
+    });
+    $("#form-huy").submit(async function (e) {
+      e.preventDefault();
+      const body = {
+        username: $("#username").val(),
+      };
+      $(".progress-spinner").attr("style", "display: flex");
+      const huyResponse = await fetch("/admin/huy", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await huyResponse.json();
+      if (huyResponse.status === 200) {
+        Alert(data.message, "/admin");
+      } else {
+        Alert(data.message);
+      }
+    });
+    $("#form-mo-khoa").submit(async function (e) {
+      e.preventDefault();
+      const body = {
+        username: $("#username").val(),
+      };
+      $(".progress-spinner").attr("style", "display: flex");
+      const huyResponse = await fetch("/admin/mo-khoa", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await huyResponse.json();
+      if (huyResponse.status === 200) {
+        Alert(data.message, "/admin");
+      } else {
+        Alert(data.message);
+      }
+    });
+    $(".gd-click").click(function (e) {
+      $(".gd-body").empty();
+      $(".gd-body").append(`
+        <input type="hidden" id="_id" value="${$(this).attr("_id")}" />
+        <div class="d-flex py-2">
+          <div class="col-4">Username:</div>
+          <div class="col-8 username-gd">${$(this).attr("username")}</div>
+        </div>
+        <div class="d-flex py-2">
+          <div class="col-4">Loại GD:</div>
+          <div>${$(this).attr("type")}</div>
+        </div>
+        <div class="d-flex py-2">
+          <div class="col-4">SDT nhận:</div>
+          <div>${$(this).attr("receiver_phone_number")}</div>
+        </div>
+        <div class="d-flex py-2">
+          <div class="col-4">Số tiền:</div>
+          <div>${$(this).attr("money")}</div>
+        </div>
+        <div class="d-flex py-2">
+          <div class="col-4">Ghi chú:</div>
+          <div>${$(this).attr("message")}</div>
+        </div>
+        <div class="d-flex py-2">
+          <div class="col-4">Trạng thái:</div>
+          <div>${$(this).attr("status")}</div>
+        </div>
+        <div class="d-flex py-2">
+          <div class="col-4">Thời gian:</div>
+          <div>${new Date($(this).attr("date")).toLocaleString("vi-VN")}</div>
+        </div>
+      `);
+    });
+    $("#btn-dong-y").click(async function (e) {
+      const body = {
+        _id: $("#_id").val(),
+        username: $(".username-gd").text().trim(),
+      };
+      $(".progress-spinner").attr("style", "display: flex");
+      const dongyResponse = await fetch("/admin/dong-y", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await dongyResponse.json();
+      if (dongyResponse.status === 200) {
+        Alert(data.message, "/admin");
+      } else {
+        Alert(data.message);
+      }
+    });
+    $("#btn-tu-choi").click(async function (e) {
+      const body = {
+        _id: $("#_id").val(),
+      };
+      $(".progress-spinner").attr("style", "display: flex");
+      const tuchoiResponse = await fetch("/admin/tu-choi", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await tuchoiResponse.json();
+      if (tuchoiResponse.status === 200) {
+        Alert(data.message, "/admin");
+      } else {
+        Alert(data.message);
+      }
     });
   }
 
-  // back button
+  // Back button
   $("#back").click(function () {
     if ($(this).hasClass("first")) {
       location.href = "/logout";
@@ -595,10 +765,12 @@ $(document).ready(async () => {
     location.href = $(this).attr("href");
   });
 });
+// Helper function
+// Alert
 function Alert(message, href = "") {
   $(".progress-spinner").attr("style", "display: none");
   $("[class^='block'].show-alert").append("<div class='notification'></div>");
-  $(".notification").html(message);
+  $(".notification").text(message);
   setTimeout(() => {
     $(".notification").addClass("hidden");
   }, 2000);

@@ -1,5 +1,10 @@
 <div class="container-home">
   <div class="block-home show-alert">
+    <div class="progress-spinner">
+      <div class="spinner-border spinner-color" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
     <div class="block-wallet-function">
       <img class="logo" src="/img/logo.png" alt="Logo" width="70" />
       <div class="function" id="home" href="/">
@@ -26,7 +31,7 @@
           <div style="flex: 1">
             <div class="history d-flex flex-column h-100">
               <div class="history-header d-flex text-center">
-                <div class="col-2">STT</div>
+                <div class="col-2"></div>
                 <div class="col-2">Loại giao dịch</div>
                 <div class="col-2">Số tiền</div>
                 <div class="col-4">Thời gian</div>
@@ -43,7 +48,29 @@
               <% } %> <% data.forEach((element,index,array) => { %> <% if (index
               >= 10) return; %>
               <div class="history-data d-flex text-center py-2">
-                <div class="col-2"><%= index+1 %></div>
+                <div class="col-2">
+                  <% if (element.type === "Deposit") { %>
+                  <i
+                    class="text-center bi bi-download"
+                    style="font-size: 14pt"
+                  ></i>
+                  <% } %> <% if (element.type === "Withdraw") { %>
+                  <i
+                    class="text-center bi bi-upload"
+                    style="font-size: 14pt"
+                  ></i>
+                  <% } %> <% if (element.type === "Transfer") { %>
+                  <i
+                    class="text-center bi bi-arrow-left-right"
+                    style="font-size: 14pt"
+                  ></i>
+                  <% } %> <% if (element.type === "Buy Card") { %>
+                  <i
+                    class="text-center bi bi-card-heading"
+                    style="font-size: 14pt"
+                  ></i>
+                  <% } %>
+                </div>
                 <div class="col-2 type"><%= element.type %></div>
                 <div class="col-2 money">
                   <%= element.money.toString().replace(/\B(?=(\d{3})+(?!\d))/g,

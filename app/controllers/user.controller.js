@@ -1,19 +1,14 @@
-//Require models
+// Require models
 const userModel = require("../models/user.model");
-const blacklistUserModel = require("../models/blacklist.model");
 
-//Require Other
+// Require Other
 const formidable = require("formidable");
+const path = require("path");
 const fs = require("fs");
-const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 //Require middleware
 const middleware = require("../middlewares/validator");
-
-// Require helper
-const helper = require("../helper/helper");
 
 // Change Password
 exports.changePassword = async (req, res) => {
@@ -61,7 +56,7 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-//Get Info User
+// Get Info User
 exports.getInfoUser = async (req, res) => {
   const form = formidable({ multiples: true });
   form.parse(req, async (err, fields, files) => {
@@ -81,9 +76,9 @@ exports.getInfoUser = async (req, res) => {
   });
 };
 
-//Update CMND
+// Update CMND
 exports.updateCMND = async (req, res) => {
-  const form = formidable({ multiples: true });
+  const form = new formidable.IncomingForm();
   form.parse(req, async (err, fields, files) => {
     if (err) {
       return res.status(400).json({ code: 400, message: err.message });
@@ -103,7 +98,7 @@ exports.updateCMND = async (req, res) => {
         (extBack_cmnd == "image/jpeg" || extBack_cmnd == "image/png")
       ) {
         const cmnd = [front_cmnd.newFilename, back_cmnd.newFilename];
-        const pathUploadCmnd = "./public/image/cmnd/";
+        const pathUploadCmnd = path.join(__dirname, "../../public/img/cmnd/");
         const dest = pathUploadCmnd + front_cmnd.newFilename;
         const dest1 = pathUploadCmnd + back_cmnd.newFilename;
         //Upload CMND
@@ -120,20 +115,19 @@ exports.updateCMND = async (req, res) => {
           const user = await userModel.findOne({ username: req.user.username });
           const destOld = pathUploadCmnd + user.cmnd[0];
           const destOld1 = pathUploadCmnd + user.cmnd[1];
-          console.log(destOld);
           fs.unlinkSync(destOld); //Remove cmnd old
           fs.unlinkSync(destOld1); //Remove cmnd old
 
           await userModel.findOneAndUpdate(
             { username: req.user.username },
-            { cmnd }
+            { cmnd, status: "Chờ xác minh" }
           );
           return res
             .status(200)
             .json({ code: 200, message: "Cập nhật thành công" });
         } catch (err) {
-          fs.unlinkSync(dest); //Remove File CMND If Add User Failed
-          fs.unlinkSync(dest1); //Remove File CMND If Add User Failed
+          fs.unlinkSync(dest); // Remove File CMND If Add User Failed
+          fs.unlinkSync(dest1); // Remove File CMND If Add User Failed
 
           return res
             .status(500)
@@ -146,10 +140,4 @@ exports.updateCMND = async (req, res) => {
       }
     }
   });
-};
-
-//Get
-// ---------------------------------------------------------
-exports.test = async (req, res) => {
-  res.end("test");
 };
