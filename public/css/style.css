@@ -390,19 +390,24 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 .block-wallet-function .function .icon {
+  user-select: none;
   font-size: 20pt;
   color: #fff;
 }
 .block-wallet-function .function span {
+  user-select: none;
   font-size: 12pt;
   color: #fff;
 }
 .block-wallet-function img.logo {
+  user-select: none;
   padding: 10px;
   position: absolute;
   top: 30px;
 }
 .block-wallet-function .logout {
+  user-select: none;
+  cursor: pointer;
   font-size: 20pt;
   color: #fff;
   border-radius: 20px;
@@ -506,6 +511,11 @@
 .v-rule-left {
   margin: 10px;
   border-left: 2px solid lightgray;
+}
+
+.history-data:hover {
+  background-color: rgba(180, 255, 255, 0.5);
+  cursor: pointer;
 }
 
 @keyframes bob {

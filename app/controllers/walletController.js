@@ -272,7 +272,7 @@ class WalletController {
       }
 
       //Receiver
-      if (fee === "Receiver") {
+      if (fee === "receiver") {
         let curr_money = sender_user.money;
         if (curr_money < amount) {
           return res
@@ -344,7 +344,7 @@ class WalletController {
           type: "Transfer",
           receiver_phone_number: receiver_user.phone,
           money: dt.money,
-          message: message,
+          message: dt.message,
           status: "Pending",
         });
         await history.save();
@@ -410,19 +410,14 @@ class WalletController {
         .status(200)
         .json({ code: 200, message: "Chuyển tiền thành công" });
     } catch (error) {
+      console.log(error);
       res.status(400).json({ code: 400, message: "lỗi" });
     }
   }
 
   async phonecards(req, res) {
+    const user = await User.findOne({ username: req.user.username }).exec();
     try {
-      const user = await User.findOne({ username: req.user.username });
-      if (!user) {
-        return res
-          .status(400)
-          .json({ code: 400, message: "Tài khoản không tồn tại" });
-      }
-
       let { nhacungcap, menhgia, soluong } = req.body;
       let curr_money = user.money;
       let total_monney = menhgia * soluong;
@@ -455,7 +450,7 @@ class WalletController {
           .json({ code: 400, message: "Số lượng thẻ không hợp lệ" });
       }
       switch (nhacungcap) {
-        case "viettel": {
+        case "Viettel": {
           if (soluong > 0) {
             for (let i = 0; i < soluong; i++) {
               let random_card = Math.floor(Math.random() * 100001);
@@ -465,7 +460,7 @@ class WalletController {
           }
           break;
         }
-        case "mobifone": {
+        case "Mobifone": {
           if (soluong > 0) {
             for (let i = 0; i < soluong; i++) {
               let random_card = Math.floor(Math.random() * 100001);
@@ -475,7 +470,7 @@ class WalletController {
           }
           break;
         }
-        case "vinaphone": {
+        case "Vinaphone": {
           if (soluong > 0) {
             for (let i = 0; i < soluong; i++) {
               let random_card = Math.floor(Math.random() * 100001);

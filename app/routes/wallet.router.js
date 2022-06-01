@@ -4,7 +4,6 @@ const historyController = require("../controllers/historyController");
 const helper = require("../helper/helper");
 
 function walletRoutes(app) {
-  // app.get("/wallet/phonecards", walletController.phonecards);
   // app.get("/wallet/phonecardDetails", historyController.cardDetails);
 
   // Home
@@ -21,6 +20,8 @@ function walletRoutes(app) {
   app.post("/wallet/transfer", walletController.transfer);
   // OTP
   app.post("/wallet/otp", walletController.verifyOTP);
+  // Phone Card
+  app.post("/wallet/phonecards", walletController.phonecards);
   // History
   app.get("/history", historyController.index);
   // Account

@@ -45,20 +45,25 @@
         background-color: rgba(255, 255, 255, 0.3);
       }
       .icon {
+        user-select: none;
         font-size: 20pt;
         color: #fff;
       }
       span {
+        user-select: none;
         font-size: 12pt;
         color: #fff;
       }
     }
     img.logo {
+      user-select: none;
       padding: 10px;
       position: absolute;
       top: 30px;
     }
     .logout {
+      user-select: none;
+      cursor: pointer;
       font-size: 20pt;
       color: #fff;
       border-radius: 20px;

@@ -1,4 +1,8 @@
-<div class="container wrap">
+<div class="container wrap p-5">
+  <h3>TRANG QUẢN LÝ ADMIN</h3>
+  <div style="margin-bottom: 15px">
+    <a href="/logout">Đăng xuất</a>
+  </div>
   <ul class="nav nav-tabs nav-fill">
     <li class="nav-item">
       <a class="nav-link active" data-bs-toggle="tab" href="#deal">Giao dịch</a>
@@ -10,25 +14,22 @@
 
   <div class="tab-content container wrap">
     <div class="tab-pane active" id="deal">
-      <table class="table table-hover" style="width:100%">
+      <table class="table table-hover" style="width: 100%">
         <thead>
           <tr>
-            <th>username</th>
-            <th>type</th>
-            <th>date</th>
+            <th>Username</th>
+            <th>Loại GD</th>
+            <th>Thời gian</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <% for (let deal of deals) { %>
-            <tr>
-              <td><%= deal.username %></td>
-              <td><%= deal.type %></td>
-              <td><%= deal.createdAt %></td>
-              <td>
-                <a class="btn btn-primary" href="/admin/deals/<%= deal.username %>/<%= deal.date %>">View</a>
-              </td>
-            </tr>
+          <tr>
+            <td><%= deal.username %></td>
+            <td><%= deal.type %></td>
+            <td><%= new Date(deal.date).toLocaleString("vi-VN") %></td>
+          </tr>
           <% } %>
         </tbody>
       </table>
@@ -38,16 +39,24 @@
         <div class="col-2">
           <ul class="nav nav-pills nav-fill flex-column">
             <li class="nav-item">
-              <a class="nav-link active" data-bs-toggle="tab" href="#act1">Chờ kích hoạt</a>
+              <a class="nav-link active" data-bs-toggle="tab" href="#act1"
+                >Chờ xác minh</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" href="#act2">Đã kích hoạt</a>
+              <a class="nav-link" data-bs-toggle="tab" href="#act2"
+                >Đã xác minh</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" href="#act3">Đã vô hiệu hóa</a>
+              <a class="nav-link" data-bs-toggle="tab" href="#act3"
+                >Đã vô hiệu hóa</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-bs-toggle="tab" href="#act4">Đang bị khóa</a>
+              <a class="nav-link" data-bs-toggle="tab" href="#act4"
+                >Đang bị khóa</a
+              >
             </li>
           </ul>
         </div>
@@ -68,9 +77,8 @@
                   <tr>
                     <td><%= user.username %></td>
                     <td><%= user.name %></td>
-                    <td><%= user.createdAt %></td>
                     <td>
-                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
+                      <%= new Date(user.createdAt).toLocaleString("vi-VN") %>
                     </td>
                   </tr>
                   <% } %>
@@ -92,9 +100,8 @@
                   <tr>
                     <td><%= user.username %></td>
                     <td><%= user.name %></td>
-                    <td><%= user.createdAt %></td>
                     <td>
-                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
+                      <%= new Date(user.createdAt).toLocaleString("vi-VN") %>
                     </td>
                   </tr>
                   <% } %>
@@ -117,9 +124,6 @@
                     <td><%= user.username %></td>
                     <td><%= user.name %></td>
                     <td><%= user.createdAt %></td>
-                    <td>
-                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
-                    </td>
                   </tr>
                   <% } %>
                 </tbody>
@@ -141,9 +145,6 @@
                     <td><%= user.username %></td>
                     <td><%= user.name %></td>
                     <td><%= user.createdAt %></td>
-                    <td>
-                      <a class="btn btn-primary" href="/admin/users/<%= user.username %>">Chi tiết</a>
-                    </td>
                   </tr>
                   <% } %>
                 </tbody>

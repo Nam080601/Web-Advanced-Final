@@ -399,6 +399,66 @@ $(document).ready(async () => {
         Alert(data.message);
       }
     });
+    // Form Mua The
+    $("#form-mua-the").submit(async (e) => {
+      e.preventDefault();
+      const body = {
+        nhacungcap: $("#nhacungcap").find(":selected").val(),
+        menhgia: $("#menhgia").find(":selected").val(),
+        soluong: $("#soluong").find(":selected").val(),
+      };
+      const withdrawResponse = await fetch("/wallet/phonecards", {
+        headers: {
+          "content-type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+      const data = await withdrawResponse.json();
+      if (withdrawResponse.status == 200) {
+        $("#nhacungcap").val("");
+        $("#menhgia").val("");
+        $("#soluong").val("");
+        $(".current-money").html(
+          MoneyDigit(
+            Number.parseInt(
+              GetCurrentMoney($(".current-money").html().trim())
+            ) - Number.parseInt(body.menhgia * body.soluong)
+          )
+        );
+        $(".card-data").append(`
+          <div class="px-5 py-3">
+            <div class="d-flex">
+              <div class="py-3 col-4">Nhà cung cấp:</div>
+              <div class="py-3 col-8">${data.data.nhacungcap}</div>
+            </div>
+            <div class="d-flex">
+              <div class="py-3 col-4">Mệnh giá:</div>
+              <div class="py-3 col-8">${data.data.menhgia}</div>
+            </div>
+            <div class="d-flex">
+              <div class="py-3 col-4">Số lượng:</div>
+              <div class="py-3 col-8">${data.data.soluong}</div>
+            </div>
+            <div class="d-flex">
+              <div class="py-3 col-4">Tổng tiền:</div>
+              <div class="py-3 col-8">${data.data.total_monney}</div>
+            </div>
+            <div class="d-flex">
+              <div class="py-3 col-4">Mã thẻ:</div>
+              <div class="py-3 col-8">${data.data.id_card}</div>
+            </div>
+          </div>
+        `);
+        $("#card-detail").click();
+        Alert(data.message);
+      } else {
+        $("#nhacungcap").val("");
+        $("#menhgia").val("");
+        $("#soluong").val("");
+        Alert(data.message);
+      }
+    });
   }
   // History page
   if (location.pathname == "/history") {
@@ -406,6 +466,56 @@ $(document).ready(async () => {
       "style",
       "background-color: rgba(255, 255, 255, 0.3)"
     );
+    $(".history-data").click(function (e) {
+      e.preventDefault();
+      $("#history-detail").click();
+      const data = {
+        type: {
+          name: "Loại GD",
+          data: $(this).children(".type").html().trim(),
+        },
+        money: {
+          name: "Số tiền",
+          data: $(this).children(".money").html().trim(),
+        },
+        message: {
+          name: "Ghi chú",
+          data: $(this).children(".message").html().trim(),
+        },
+        time: {
+          name: "Thời gian",
+          data: $(this).children(".time").html().trim(),
+        },
+        status: {
+          name: "Trạng thái",
+          data: $(this).children(".status").html().trim(),
+        },
+      };
+      $(".history-detail-data").append(`
+      <div class="px-5 py-3">
+        <div class="d-flex">
+          <div class="py-3 col-4">${data.type.name}:</div>
+          <div class="py-3 col-8">${data.type.data}</div>
+        </div>
+        <div class="d-flex">
+          <div class="py-3 col-4">${data.money.name}:</div>
+          <div class="py-3 col-8">${data.money.data}</div>
+        </div>
+        <div class="d-flex">
+          <div class="py-3 col-4">${data.message.name}:</div>
+          <div class="py-3 col-8">${data.message.data}</div>
+        </div>
+        <div class="d-flex">
+          <div class="py-3 col-4">${data.time.name}:</div>
+          <div class="py-3 col-8">${data.time.data}</div>
+        </div>
+        <div class="d-flex">
+          <div class="py-3 col-4">${data.status.name}:</div>
+          <div class="py-3 col-8">${data.status.data}</div>
+        </div>
+      </div>
+      `);
+    });
   }
   // Account page
   if (location.pathname == "/account") {
@@ -413,107 +523,6 @@ $(document).ready(async () => {
       "style",
       "background-color: rgba(255, 255, 255, 0.3)"
     );
-  }
-  // Withdraw form
-  if (location.pathname == "/wallet/withdraw") {
-    $("#form-withdraw").submit(async (e) => {
-      e.preventDefault();
-      const card_number = $("#card_number").val();
-      const expiry_date = $("#expiry_date").val();
-      const withdraw_money = $("#withdraw_money").val();
-      const cvv = $("#cvv").val();
-
-      try {
-        const response = await fetch("/wallet/withdraw", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            card_number,
-            expiry_date,
-            withdraw_money,
-            cvv,
-          }),
-        });
-        const data = await response.json();
-        console.log(data);
-        if (data.code === 200) {
-          location.href = "/wallet";
-          alert(data.message);
-        } else {
-          $(".btn").next().remove();
-          $(".btn").after(
-            `<div class='alert alert-danger my-2'>${data.message}</div>`
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });
-  }
-  //transfer form
-  if (location.pathname == "/wallet/transfer") {
-    $("#form-transfer").submit(async (e) => {
-      e.preventDefault();
-      const phone_number = $("#phone_number").val();
-      const message = $("#message").val();
-      const transfer_money = $("#transfer_money").val();
-      const fee_payer = $("#fee_payer").val();
-
-      try {
-        const response = await fetch("/wallet/transfer", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            phone_number,
-            transfer_money,
-            message,
-            fee_payer,
-          }),
-        });
-        const data = await response.json();
-        if (data.code === 200) {
-          alert(data.message);
-          location.href = `/wallet/transfer/verifyOTP`;
-        } else {
-          $(".btn").next().remove();
-          $(".btn").after(
-            `<div class='alert alert-danger my-2'>${data.message}</div>`
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });
-  }
-
-  //verify OTP
-  if (location.pathname == "/wallet/transfer/verifyOTP") {
-    $("#form-transfer-OTP").submit(async (e) => {
-      e.preventDefault();
-      const OTP_number = $("#OTP_number").val();
-      console.log(OTP_number);
-
-      try {
-        const response = await fetch("/wallet/transfer/verifyOTP", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ OTP_number }),
-        });
-        const data = await response.json();
-        console.log(data);
-        if (data.code === 200) {
-          location.href = "/wallet";
-          alert(data.message);
-        } else {
-          $(".btn").next().remove();
-          $(".btn").after(
-            `<div class='alert alert-danger my-2'>${data.message}</div>`
-          );
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    });
   }
   //phone cards
   if (location.pathname == "/wallet/phonecards") {

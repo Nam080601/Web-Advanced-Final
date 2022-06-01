@@ -4,17 +4,17 @@ const history = require("../models/history.model");
 class AdminController {
   async index(req, res, next) {
     const userWait = JSON.parse(
-      JSON.stringify(await userModel.find({ status: "chờ kích hoạt" }))
+      JSON.stringify(await userModel.find({ status: "Chờ xác minh" }))
     ).sort((a, b) => (a.createdAt < b.createdAt || a.cmnd ? 1 : -1));
     const userAct = JSON.parse(
-      JSON.stringify(await userModel.find({ status: "đã kích hoạt" }))
+      JSON.stringify(await userModel.find({ status: "Đã xác minh" }))
     ).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
     const userDis = JSON.parse(
-      JSON.stringify(await userModel.find({ status: "đã bị vô hiệu hóa" }))
+      JSON.stringify(await userModel.find({ status: "Đã bị vô hiệu hóa" }))
     ).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
     const userLock = JSON.parse(
       JSON.stringify(
-        await userModel.find({ status: "đang bị khóa vô thời hạn" })
+        await userModel.find({ status: "Đang bị khóa vô thời hạn" })
       )
     );
     const deals = JSON.parse(
@@ -55,7 +55,7 @@ class AdminController {
       (elem) => elem._id === req.params.id
     )[0];
     console.log(deal);
-    res.render("admin/deal-detail.ejs", { title: "Deal Detail", deal });
+    res.render("admin/deal-detail", { title: "Deal Detail", deal });
   }
 
   async act(req, res, next) {
@@ -64,9 +64,9 @@ class AdminController {
   }
 
   async actD(req, res, next) {
-    const user = JSON.parse(
-      JSON.stringify(await userModel.findOne({ username: req.params.username }))
-    );
+    const user = await userModel
+      .findOne({ username: req.params.username })
+      .exec();
     const deal = JSON.parse(JSON.stringify(await history.find({}))).filter(
       (elem) => elem._id === req.params.id
     )[0];

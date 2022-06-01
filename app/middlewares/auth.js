@@ -40,6 +40,9 @@ const userAuth = (req, res, next) => {
       req.user = decoded;
       next();
     });
+    if (req.user.role === "Admin" && !req.path.match(/\/admin*/g)) {
+      return res.redirect(303, "/admin");
+    }
   }
 };
 
